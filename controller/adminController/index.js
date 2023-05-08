@@ -48,9 +48,56 @@ const handlePutProgram = (req, res) => {
     }
 }
 
+const handleGetDepartment = (req, res) => {
+    const schoolId = req.query.schoolId;
+    if (!schoolId) {
+        res.send({ 
+            statusCode: 400,
+            responseData: 'Cần cung cấp mã trường'
+        })
+    } else {
+        adminModel.getAllDepartment(schoolId, res)
+    }
+}
+
+const handleGetTeacherInDepartment = (req, res) => {
+    adminModel.getAllTeachersInDepartment(req, res)
+}
+
+const handlePostDepartment = (req, res) => {
+    const department_name = req.body.department_name;
+    const majors = req.body.majors;
+    if (department_name === '' || majors === '') {
+        res.send({ 
+            statusCode: 400, 
+            responseData: 'Vui lòng nhập đầy đủ thông tin dữ liệu của khoa'
+        });
+    } else {
+        adminModel.postNewDepartment(req, res);
+    }
+}
+
+const handlePutDepartment = (req, res) => {
+    const department_name = req.body.department_name;
+    const majors = req.body.majors;
+    const department_head = req.body.department_head;
+    if (department_name === '' || majors === '' || department_head === null) {
+        res.send({ 
+            statusCode: 400, 
+            responseData: 'Vui lòng nhập đầy đủ thông tin dữ liệu của khoa'
+        });
+    } else {
+        adminModel.editDepartment(req, res);
+    }
+}
+
 module.exports = {
     handleGetSchool,
     handleGetProgram,
     handlePostProgram,
-    handlePutProgram
+    handlePutProgram,
+    handleGetDepartment,
+    handleGetTeacherInDepartment,
+    handlePostDepartment,
+    handlePutDepartment
 }
