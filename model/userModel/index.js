@@ -45,8 +45,24 @@ const updateToken = (data, res) => {
     })
 }
 
-const getUserData = (query, res) => {
+const getUserAccountData = (query, res) => {
     db.query(`SELECT * FROM user_account WHERE token='${query.token}'`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result,
+            })
+        }
+    })
+}
+
+const getUserPersonData = (query, res) => {
+    db.query(`SELECT up.full_name, up.image, up.phone, up.email, up.address FROM user_person up, user_account ua WHERE ua.token='${query.token}' AND ua.username = up.username`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,
@@ -80,6 +96,7 @@ const resetToken = (res) => {
 module.exports = {
     handleLoginDataModel,
     updateToken,
-    getUserData,
+    getUserAccountData,
+    getUserPersonData,
     resetToken,
 }

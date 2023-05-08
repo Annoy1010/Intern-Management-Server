@@ -16,8 +16,12 @@ const handleToken = (req, res) => {
     userModel.updateToken(req.body, res);
 }
 
-const handleUserDataByToken = (req, res) => {
-    userModel.getUserData(req.query, res);
+const handleUserAccountDataByToken = (req, res) => {
+    userModel.getUserAccountData(req.query, res);
+}
+
+const handleUserPersonDataByToken = (req, res) => {
+    userModel.getUserPersonData(req.query, res);
 }
 
 const handleLogout = (req, res) => {
@@ -27,6 +31,7 @@ const handleLogout = (req, res) => {
 module.exports = {
     handleLoginInput,
     handleToken,
-    handleUserDataByToken,
+    handleUserAccountDataByToken,
+    handleUserPersonDataByToken,
     handleLogout,
 }
