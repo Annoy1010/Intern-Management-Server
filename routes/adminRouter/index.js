@@ -11,5 +11,11 @@ router.get('/department', adminController.handleGetDepartment);
 router.get('/department/teachers', adminController.handleGetTeacherInDepartment);
 router.post('/department/new', adminController.handlePostDepartment);
 router.put('/department/edit', adminController.handlePutDepartment);
+router.get('/teacher', adminController.handleGetTeacher);
+router.post('/teacher/createAccount', adminController.handlePostTeacherAccount);
+router.post('/teacher/createPersonalInfo', adminController.handleTeacherPersonal);
+router.post('/teacher/createDetailInfo', adminController.handleTeacherDetail);
+router.put('/teacher/editPersonalInfo', adminController.handleTeacherPersonal);
+router.put('/teacher/editDetailInfo', adminController.handleTeacherDetail);
 
 module.exports = router;

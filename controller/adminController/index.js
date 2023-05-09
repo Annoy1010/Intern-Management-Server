@@ -91,6 +91,66 @@ const handlePutDepartment = (req, res) => {
     }
 }
 
+const handleGetTeacher = (req, res) => {
+    adminModel.getAllTeacher(req, res)
+}
+
+const handlePostTeacherAccount = (req, res) => {
+    const full_name = req.body.full_name;
+    if (full_name === '') {
+        res.send({
+            statusCode: 400,
+            responseData: 'Vui lòng điền đầy đủ thông tin giảng viên'
+        })
+    } else {
+        const hashedUsername = () => {
+            const splitName = full_name.split(' ');
+            const hashFullName = splitName.map((name) => name[0].toLowerCase());
+            const randomNumber = Math.floor(Math.random() * 10000) + 1;
+            const createUsername = `${hashFullName.join('')}_gv_${randomNumber}`;
+            return createUsername;
+        };
+
+        adminModel.postTeacherAccount(hashedUsername(), res);
+    }
+}
+
+const handleTeacherPersonal = (req, res) => {
+    const data = req.body;
+    const existedEmpty = Object.keys(data).some(item => data[`${item}`] === '')
+    if (existedEmpty) {
+        res.send({
+            statusCode: 400,
+            responseData: 'Vui lòng điền đầy đủ thông tin giảng viên'
+        })
+    } else {
+        if (data.isPosted) {
+            adminModel.postTeacherPersonal(data, res);
+        } else {
+            adminModel.putTeacherPersonal(data, res);
+        }
+    }
+}
+
+const handleTeacherDetail = (req, res) => {
+    const data = req.body;
+    const nullTeachingStatus = -1;
+    const nullDepartment = 0;
+    const existedEmpty = Object.keys(data).some(item => data[`${item}`] === '' || data[`${item}`] === nullTeachingStatus || data[`${item}`] === nullDepartment)
+    if (existedEmpty) {
+        res.send({
+            statusCode: 400,
+            responseData: 'Vui lòng điền đầy đủ thông tin giảng viên'
+        })
+    } else {
+        if (data.isPosted) {
+            adminModel.postTeacherDetail(data, res);
+        } else {
+            adminModel.putTeacherDetail(data, res);
+        }
+    }
+}
+
 module.exports = {
     handleGetSchool,
     handleGetProgram,
@@ -99,5 +159,9 @@ module.exports = {
     handleGetDepartment,
     handleGetTeacherInDepartment,
     handlePostDepartment,
-    handlePutDepartment
+    handlePutDepartment,
+    handleGetTeacher,
+    handlePostTeacherAccount,
+    handleTeacherPersonal,
+    handleTeacherDetail,
 }
