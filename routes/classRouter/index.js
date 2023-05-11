@@ -8,5 +8,7 @@ router.get('/', classController.getClassAllController);
 router.get('/year', classController.getClassYearController);
 router.get('/academicyear', classController.getAcademicYearController);
 router.put('/update', classController.updateClassController);
+router.delete('/delete', classController.deleteClassController);
+router.get('/department', classController.getClassOfDepartmentController);
 
 module.exports = router;

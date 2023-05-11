@@ -37,6 +37,13 @@ const updateClassController = (req, res) => {
     }
 }
 
+const deleteClassController = (req, res) => {
+    classModel.deleteClassModel(req, res);
+}
+
+const getClassOfDepartmentController = (req, res) => {
+    classModel.getClassOfDepartment(req, res);
+}
 
 module.exports = {
     addClassController,
@@ -44,4 +51,6 @@ module.exports = {
     getClassYearController,
     getAcademicYearController,
     updateClassController,
+    deleteClassController,
+    getClassOfDepartmentController,
 }

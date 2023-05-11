@@ -99,10 +99,37 @@ const updateClass = (req, res) => {
     })
 }
 
+const deleteClassModel = (req, res) => {
+    const class_id = req.query.class_id;
+    db.query(`DELETE FROM class WHERE id = ${class_id}`, (err, result) => {
+        if(err){
+            console.log(err);
+        }else{
+            res.send({
+                statusCode: 200,
+                responseData: 'Xóa lớp thành công',
+            });
+        }
+    });
+}
+
+const getClassOfDepartment = (req, res) => {
+    const {department_id} = req.query;
+    db.query(`SELECT * FROM class WHERE department_id = ${department_id}`, (err, result) => {
+        if(err) {
+            console.log(err);
+        }else{
+            res.send(result);
+        }
+    });
+}
+
 module.exports = {
     addClassModel,
     getClassAllModel,
     getClassYearModel,
     getAcademicYear,
     updateClass,
+    deleteClassModel,
+    getClassOfDepartment,
 }
