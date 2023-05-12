@@ -110,6 +110,7 @@ const addBusiness = (Business, res) => {
     const desc = Business.desc;
     const phone = Business.phone;
     const address = Business.address;
+    const img = Business.img;
     db.query(`SELECT username FROM user_account WHERE username = '${username}'`, (err, result) => {
         if(err){
             console.log(err);
@@ -146,7 +147,7 @@ const addBusiness = (Business, res) => {
                                 }
                             })
 
-                            db.query(`INSERT INTO user_person (username, full_name, phone, email, address) values('${username}', '${representator}', '${phone}', '${email}', '${address}')`, (err, result) => {
+                            db.query(`INSERT INTO user_person (username, full_name, phone, email, address, image) values('${username}', '${representator}', '${phone}', '${email}', '${address}', '${img}')`, (err, result) => {
                                 if(err){
                                     console.log(err);
                                 }else{
