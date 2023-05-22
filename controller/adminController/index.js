@@ -48,6 +48,14 @@ const handlePutProgram = (req, res) => {
     }
 }
 
+const handleGetAcademicYear = (req, res) => {
+    adminModel.getAcademicYear(req, res);
+}
+
+const handleGetSemester = (req, res) => {
+    adminModel.getSemester(req, res);
+}
+
 const handleGetDepartment = (req, res) => {
     const schoolId = req.query.schoolId;
     if (!schoolId) {
@@ -60,17 +68,44 @@ const handleGetDepartment = (req, res) => {
     }
 }
 
+const handleGetDepartmentHead = (req, res) => {
+    adminModel.getDepartmentHead(req, res);
+}
+
+const handleGetMajor = (req, res) => {
+    adminModel.getMajorByDepartment(req, res);
+}
+
+const handleRemoveMajor = (req, res) => {
+    const id = req.query.id;
+    if (!id) {
+        res.send({
+            statusCode: 400,
+            responseData: 'Vui lòng cung cấp mã ngành học'
+        })
+    } else {
+        adminModel.removeMajor(id, res);
+    }
+}
+
+
+
 const handleGetTeacherInDepartment = (req, res) => {
-    adminModel.getAllTeachersInDepartment(req, res)
+    adminModel.getAllTeachersInDepartment(req, res);
 }
 
 const handlePostDepartment = (req, res) => {
     const department_name = req.body.department_name;
-    const majors = req.body.majors;
-    if (department_name === '' || majors === '') {
+    const major_list = req.body.major_list;
+    if (department_name.trim() === '') {
         res.send({ 
             statusCode: 400, 
-            responseData: 'Vui lòng nhập đầy đủ thông tin dữ liệu của khoa'
+            responseData: 'Vui lòng nhập thông tin tên khoa'
+        });
+    } else if (major_list.length === 0) {
+        res.send({ 
+            statusCode: 400, 
+            responseData: 'Vui lòng nhập danh sách ngành học của khoa'
         });
     } else {
         adminModel.postNewDepartment(req, res);
@@ -79,9 +114,9 @@ const handlePostDepartment = (req, res) => {
 
 const handlePutDepartment = (req, res) => {
     const department_name = req.body.department_name;
-    const majors = req.body.majors;
     const department_head = req.body.department_head;
-    if (department_name === '' || majors === '' || department_head === null) {
+    const major_list = req.body.major_list;
+    if (department_name === '' || department_head === null) {
         res.send({ 
             statusCode: 400, 
             responseData: 'Vui lòng nhập đầy đủ thông tin dữ liệu của khoa'
@@ -151,17 +186,86 @@ const handleTeacherDetail = (req, res) => {
     }
 }
 
+const handlePostSubject = (req, res) => {
+    const data = req.body;
+    const keys = Object.keys(data);
+    const IsExistedNullInput = keys.some(item => data[item] === null);
+    if (IsExistedNullInput) {
+        res.send({
+            statusCode: 400,
+            responseData: 'Vui lòng điền đầy đủ thông tin giảng viên'
+        })
+    } else {
+        const IsExistedInvalidNumber = keys.some(item => Number.isInteger(data[item]) === false && Number.parseInt(data[item]) <= 0);
+        if (IsExistedInvalidNumber) {
+                res.send({
+                    statusCode: 400,
+                    responseData: 'Dữ liệu nhập không hợp lệ. Vui lòng kiểm tra lại'
+                })
+        } else {
+                adminModel.postSubject(data, res);
+        }
+    }
+}
+
+const handleGetSubject = (req, res) => {
+    const semester_id = req.query.semester_id;
+    const academic_year = req.query.academic_year;
+
+    if (Number.parseInt(semester_id) === 0 && Number.parseInt(academic_year) === 0) {
+        adminModel.getAllSubject(req, res);
+    } else {
+        if (Number.parseInt(semester_id) !== 0 && Number.parseInt(academic_year) === 0) {
+            adminModel.getSubjectBySemester(semester_id, res);
+        } else if (Number.parseInt(semester_id) === 0 && Number.parseInt(academic_year) !== 0) {
+            adminModel.getSubjectByAcademicYear(academic_year, res);
+        } else {
+            adminModel.getSubjectByAllFilter(semester_id, academic_year, res);
+        }
+    }
+}
+
+const handlePutSubject = (req, res) => {
+    const data = req.body;
+    const keys = Object.keys(data);
+    const IsExistedNullInput = keys.some(item => data[item] === null);
+    if (IsExistedNullInput) {
+        res.send({
+            statusCode: 400,
+            responseData: 'Vui lòng điền đầy đủ thông tin giảng viên'
+        })
+    } else {
+        const IsExistedInvalidNumber = keys.some(item => Number.isInteger(data[item]) === false && Number.parseInt(data[item]) <= 0);
+        if (IsExistedInvalidNumber) {
+                res.send({
+                    statusCode: 400,
+                    responseData: 'Dữ liệu nhập không hợp lệ. Vui lòng kiểm tra lại'
+                })
+        } else {
+                adminModel.putSubject(data, res);
+        }
+    }
+}
+
 module.exports = {
     handleGetSchool,
     handleGetProgram,
     handlePostProgram,
     handlePutProgram,
+    handleGetAcademicYear,
+    handleGetSemester,
     handleGetDepartment,
+    handleGetDepartmentHead,
+    handleGetMajor,
+    handleRemoveMajor,
+    handleGetTeacher,
     handleGetTeacherInDepartment,
     handlePostDepartment,
     handlePutDepartment,
-    handleGetTeacher,
     handlePostTeacherAccount,
     handleTeacherPersonal,
     handleTeacherDetail,
+    handlePostSubject,
+    handleGetSubject,
+    handlePutSubject
 }

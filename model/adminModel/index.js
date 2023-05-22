@@ -88,8 +88,40 @@ const editProgram = (data, res) => {
     })
 }
 
+const getAcademicYear = (req, res) => {
+    db.query('SELECT * FROM academic_year', (err, result) => {
+        if (err) {
+            res.send({ 
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result
+            })
+        }
+    })
+}
+
+const getSemester = (req, res) => {
+    db.query('SELECT * FROM semester', (err, result) => {
+        if (err) {
+            res.send({ 
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result
+            })
+        }
+    })
+}
+
 const getAllDepartment = (schoolId, res) => {
-    db.query(`SELECT d.id, d.department_name, d.department_head, d.majors, up.full_name, d.school_id FROM department d, teacher t, user_person up WHERE d.department_head = t.id AND t.user_id = up.id AND d.school_id = ${schoolId}`, (err, result) => {
+    db.query(`SELECT * FROM department WHERE school_id = ${schoolId}`, (err, result) => {
         if (err) {
             res.send({ 
                 statusCode: 400,
@@ -100,6 +132,77 @@ const getAllDepartment = (schoolId, res) => {
                 statusCode: 200,
                 responseData: result,
             })
+        }
+    })
+}
+
+const getDepartmentHead = (req, res) => {
+    const department_head = req.query.department_head;
+    db.query(`SELECT up.full_name, t.id FROM teacher t, user_person up WHERE t.user_id = up.id AND t.id=${department_head}`, (err, result) => {
+        if (err) {
+            res.send({ 
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            if (result.length > 0) {
+                res.send({ 
+                    statusCode: 200,
+                    responseData: {
+                        full_name: result[0].full_name,
+                        id: result[0].id,
+                    },
+                })
+            } else {
+                res.send({ 
+                    statusCode: 200,
+                    responseData: {
+                        full_name: 'Còn trống',
+                        id: 0,
+                    },
+                })
+            }
+            
+        }
+    })
+}
+
+const getMajorByDepartment = (req, res) => {
+    const department_id = req.query.department_id;
+    db.query(`SELECT m.id, m.major_name, m.department_id FROM major m, department d WHERE m.department_id = d.id AND m.department_id = ${department_id}`, (err, result) => {
+        if (err) {
+            res.send({
+                status: 400,
+                responseData: err
+            })
+        } else {
+            res.send({
+                status: 200,
+                responseData: result
+            })
+        }
+    })
+}
+
+const removeMajor = (id, res) => {
+    db.query(`DELETE FROM major WHERE id=${id}`, (err, result) => {
+        if (err) {
+            res.send({
+                status: 400,
+                responseData: err
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                res.send({
+                    status: 200,
+                    responseData: 'Xóa thành công'
+                })
+            } else {
+                res.send({
+                    status: 400,
+                    responseData: 'Xóa thất bại'
+                })
+            }
         }
     })
 }
@@ -121,11 +224,27 @@ const getAllTeachersInDepartment = (req, res) => {
     })
 }
 
+const insertMajor = (major_item, department_id, successfulRows) => {
+    db.query(`INSERT INTO major (major_name, department_id) VALUES (N'${major_item}', ${department_id})`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            if (result.affectedRows) {
+                successfulRows++;
+            }
+        }
+    })
+    return successfulRows;
+}
+
 const postNewDepartment = (req, res) => {
     const department_name = req.body.department_name;
-    const majors = req.body.majors;
+    const major_list = req.body.major_list;
     const school_id = req.body.school_id;
-    db.query(`INSERT INTO department(department_name, department_head, school_id, majors) VALUE (N'${department_name}', null, ${majors}, ${school_id})`, (err, result) => {
+    db.query(`INSERT INTO department(department_name, department_head, school_id, majors) VALUE (N'${department_name}', null, ${school_id}, 0)`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,
@@ -133,6 +252,10 @@ const postNewDepartment = (req, res) => {
             })
         } else {
             if (result.affectedRows > 0) {
+                const department_id = result.insertId;
+                for (let major_item of major_list) {
+                    insertMajor(major_item, department_id);
+                }
                 res.send({
                     statusCode: 200,
                     responseData: 'Thêm mới dữ liệu khoa thành công',
@@ -145,10 +268,10 @@ const postNewDepartment = (req, res) => {
 const editDepartment = (req, res) => {
     const id = req.body.id;
     const department_name = req.body.department_name;
-    const majors = req.body.majors;
     const department_head = req.body.department_head;
     const school_id = req.body.school_id;
-    db.query(`UPDATE department SET department_name = N'${department_name}', majors = ${majors}, department_head = ${department_head}, school_id = ${school_id} WHERE id=${id}`, (err, result) => {
+    const major_list = req.body.major_list;
+    db.query(`UPDATE department SET department_name = N'${department_name}', department_head = ${department_head}, school_id = ${school_id} WHERE id=${id}`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,
@@ -156,10 +279,15 @@ const editDepartment = (req, res) => {
             })
         } else {
             if (result.affectedRows > 0) {
+                const department_id = id;
+                for (let major_item of major_list) {
+                    insertMajor(major_item, department_id);
+                }
                 res.send({
                     statusCode: 200,
                     responseData: 'Chỉnh sửa dữ liệu khoa thành công',
                 })
+               
             }
         }
     })
@@ -303,20 +431,145 @@ const putTeacherDetail = (data, res) => {
     })
 }
 
+const postSubject = (data, res) => {
+    const unit = data.unit;
+    const sessions = data.sessions;
+    const max_students = data.max_students;
+    const teacher_id = data.teacher_id;
+    const department_id = data.department_id;
+    const academic_year = data.academic_year;
+    const semester_id = data.semester_id;
+
+    db.query(`INSERT INTO intern_subject (unit, sessions, max_students, teacher_id, department_id, semester_id, academic_year) VALUES (${unit}, ${sessions}, ${max_students}, ${teacher_id}, ${department_id}, ${semester_id}, ${academic_year})`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: 'Thêm mới môn học thành công',
+            })
+        }
+    })
+}
+
+const putSubject = (data, res) => {
+    const id = data.id;
+    const unit = data.unit;
+    const sessions = data.sessions;
+    const max_students = data.max_students;
+    const teacher_id = data.teacher_id;
+    const department_id = data.department_id;
+    const academic_year = data.academic_year;
+    const semester_id = data.semester_id;
+
+    db.query(`UPDATE intern_subject SET unit=${unit}, sessions=${sessions}, max_students=${max_students}, teacher_id=${teacher_id}, department_id=${department_id}, academic_year=${academic_year}, semester_id=${semester_id} WHERE id=${id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            if (res.affectedRows > 0) {
+                res.send({
+                    statusCode: 200,
+                    responseData: 'Cập nhật dữ liệu môn học thành công',
+                })
+            }
+        }
+    })
+}
+
+const getAllSubject = (req, res) => {
+    db.query('SELECT * FROM intern_subject', (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result,
+            })
+        }
+    })
+}
+
+const getSubjectBySemester = (semester_id, res) => {
+    db.query(`SELECT * FROM intern_subject WHERE semester_id = ${semester_id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result,
+            })
+        }
+    })
+}
+
+const getSubjectByAcademicYear = (academic_year, res) => {
+    db.query(`SELECT * FROM intern_subject WHERE academic_year = ${academic_year}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result,
+            })
+        }
+    })
+}
+
+const getSubjectByAllFilter = (semester_id, academic_year, res) => {
+    db.query(`SELECT * FROM intern_subject WHERE semester_id = ${semester_id} AND academic_year=${academic_year}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result,
+            })
+        }
+    })
+}
 
 module.exports = {
     getSchool,
     getAllProgram,
     postNewProgram,
     editProgram,
+    getAcademicYear,
+    getSemester,
     getAllDepartment,
     getAllTeachersInDepartment,
     postNewDepartment,
     editDepartment,
+    getDepartmentHead,
+    getMajorByDepartment,
+    removeMajor,
     getAllTeacher,
     postTeacherAccount,
     postTeacherPersonal,
     postTeacherDetail,
     putTeacherPersonal,
     putTeacherDetail,
+    postSubject,
+    putSubject,
+    getAllSubject,
+    getSubjectBySemester,
+    getSubjectByAcademicYear,
+    getSubjectByAllFilter
 }
