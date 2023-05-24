@@ -64,7 +64,7 @@ const getUserAccountData = (query, res) => {
 }
 
 const getUserPersonData = (query, res) => {
-    db.query(`SELECT up.full_name, up.image, up.phone, up.email, up.address FROM user_person up, user_account ua WHERE ua.token='${query.token}' AND ua.username = up.username`, (err, result) => {
+    db.query(`SELECT up.id, up.full_name, up.image, up.phone, up.email, up.address FROM user_person up, user_account ua WHERE ua.token='${query.token}' AND ua.username = up.username`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,
