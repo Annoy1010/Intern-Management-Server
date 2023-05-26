@@ -19,6 +19,22 @@ const getALLStudents = (req, res) => {
     });
 }
 
+const getStudentIdByUserId = (user_id, res) => {
+    db.query(`SELECT * FROM student WHERE user_id = ${user_id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result[0].id
+            })
+        }
+    })
+}
+
 const addStudent = (req, res) => {
     const { image,
             full_name,
@@ -298,8 +314,221 @@ const deleteRegistSubject = (id, res) => {
     })
 }
 
+const postRegistInternJobRequest = (req, res) => {
+    const student_id = req.body.student_id;
+    const job_id = req.body.job_id;
+    const date = new Date();
+    const currentDate = `${date.getUTCFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+
+    const postRequest = () => {
+        db.query(`INSERT INTO student_request_regist_intern (student_id, job_id, regist_submit_status, regist_date) VALUE (${student_id}, ${job_id}, 2, '${currentDate}')`, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err.toString()
+                })
+            } else {
+                if (result.affectedRows > 0) {
+                    res.send({
+                        statusCode: 200,
+                        responseData: 'Bạn đã gửi yêu cầu thông tin công việc thành công'
+                    })
+                }
+            }
+        })
+    }
+
+    const checkPendingRequest = () => {
+        db.query(`SELECT * FROM student_request_regist_intern WHERE student_id=${student_id} AND  regist_submit_status=2`, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err.toString()
+                })
+            } else {
+                if (result.length > 0) {
+                    res.send({
+                        statusCode: 400,
+                        responseData: 'Bạn không thể gửi yêu cầu khi có yêu cầu đang được chờ xác nhận'
+                    })
+                } else {
+                    postRequest();
+                }
+            }
+        })
+    }
+
+    const handlePostRequest = () => {
+        db.query(`SELECT * FROM student_request_regist_intern WHERE student_id=${student_id} AND regist_submit_status=1`, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err.toString()
+                })
+            } else {
+                if (result.length > 0) {
+                    res.send({
+                        statusCode: 400,
+                        responseData: 'Bạn không thể gửi yêu cầu khi đã có yêu cầu được xác nhận thành công'
+                    })
+                } else {
+                    checkPendingRequest();
+                }
+            }
+        })
+    }
+    
+    handlePostRequest();
+}
+
+const getAllRegistInternJobRequest = (student_id, res) => {
+    db.query(`SELECT sr.id, up.full_name as company_name, j.job_name, sr.regist_submit_status, sr.regist_date FROM student_request_regist_intern sr, job j, business b, user_person up WHERE sr.student_id=${student_id} AND sr.job_id=j.id AND j.business_id=b.id AND b.user_id=up.id`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            res.send({ 
+                statusCode: 200, 
+                responseData: result,
+            })
+        }
+    })
+}
+
+const deleteRegistInternJobRequest = (id, res) => {
+    db.query(`DELETE FROM student_request_regist_intern WHERE id=${id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                res.send({
+                    statusCode: 200,
+                    responseData: 'Gỡ bỏ yêu cầu thông tin công việc thành công'
+                })
+            } else {
+                res.send({
+                    statusCode: 400,
+                    responseData: 'Gỡ yêu cầu không thành công'
+                })
+            }
+        }
+    })
+}
+
+const getAllJobs = (req, res) => {
+    db.query(`SELECT * FROM job WHERE vacancies > 0`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            res.send({ 
+                statusCode: 200, 
+                responseData: result,
+            })
+        }
+    })
+}
+
+const getJobInLibraryOfStudent = (student_id, job_id, res) => {
+    db.query(`SELECT * FROM job_favorite WHERE student_id=${student_id} AND job_id=${job_id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result
+            })
+        }
+    })
+}
+
+const postJobToLibrary = (student_id, job_id, res) => {
+    const date = new Date();
+    const currentDate = `${date.getUTCFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+
+    db.query(`INSERT INTO job_favorite (creation_date, student_id, job_id) VALUES ('${currentDate}', ${student_id}, ${job_id})`,  (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: 'Bạn đã lưu công việc vào thư viện thành công'
+            })
+        }
+    })
+}
+
+const getAllJobsInLibrary = (student_id, res) => {
+    db.query(`SELECT j.id, j.job_name, j.image, j.job_desc, j.requirements, j.another_information, j.business_id, j.vacancies FROM job j, job_favorite jf WHERE jf.student_id=${student_id} and j.id=jf.job_id`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result
+            })
+        }
+    })
+}
+
+const deleteJobFromLibrary = (student_id, job_id, res) => {
+    db.query(`DELETE FROM job_favorite WHERE student_id=${student_id} AND job_id=${job_id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                res.send({
+                    statusCode: 200,
+                    responseData: 'Bạn đã gỡ bỏ công việc này khỏi thư viện thành công'
+                })
+            } else {
+                res.send({
+                    statusCode: 400,
+                    responseData: 'Yêu cầu gỡ công việc không thành công'
+                })
+            }
+        }
+    }) 
+}
+
+const getCareJob  = (student_id, res) => {
+    db.query(`SELECT jf.student_id, jf.job_id, j.job_name, up.full_name as company_name, b.industry_sector, j.job_desc FROM job_favorite jf, job j, business b, user_person up WHERE jf.student_id=${student_id} AND jf.job_id=j.id AND j.business_id=b.id AND b.user_id=up.id`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result
+            })
+        }
+    })
+}
+
 module.exports = {
     getALLStudents,
+    getStudentIdByUserId,
     addStudent,
     updateStudent,
     deleteStudent,
@@ -309,5 +538,14 @@ module.exports = {
     checkRegistLearnSubjectRequest,
     postRegistLearnSubjectRequest,
     getRegistedSubjectInfo,
-    deleteRegistSubject
+    deleteRegistSubject,
+    postRegistInternJobRequest,
+    getAllRegistInternJobRequest,
+    deleteRegistInternJobRequest,
+    getAllJobs,
+    getJobInLibraryOfStudent,
+    postJobToLibrary,
+    getAllJobsInLibrary,
+    deleteJobFromLibrary,
+    getCareJob
 }
