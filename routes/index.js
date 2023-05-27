@@ -1,4 +1,5 @@
 const userRouter = require('./userRouter');
+const adminRouter = require('./adminRouter');
 const classRouter = require('./classRouter');
 const departmentRouter = require('./departmentRouter');
 const teacherRouter = require('./teacherRouter');
@@ -9,6 +10,7 @@ const businessRoter = require('./businessRouter');
 
 function route(app) {
     app.use('/user', userRouter);
+    app.use('/admin', adminRouter);
     app.use('/class', classRouter);
     app.use('/department', departmentRouter);
     app.use('/teacher', teacherRouter);
