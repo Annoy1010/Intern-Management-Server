@@ -100,6 +100,22 @@ const verifyEmailModel = (email, res) => {
     })
 }
 
+const resetPass = (req, res) => {
+    const pass = req.body.pass;
+    const email = req.body.email;
+    db.query(`UPDATE user_account a, user_person p SET a.pass = '${pass}' WHERE a.username = p.username and p.email = ${email}`, (err, result) => {
+        if(err){
+            console.log(err);
+        }else{
+            res.send({
+                statusCode: 200,
+                responseData: 'Bạn đã cập nhật mật khẩu thành công',
+            });
+        }
+    });
+}
+
+
 const addBusiness = (Business, res) => {
     const username = Business.name;
     const pass = hashPass('123456');
@@ -187,4 +203,5 @@ module.exports = {
     verifyEmailModel,
     addBusiness,
     getBusinessModel,
+    resetPass,
 }

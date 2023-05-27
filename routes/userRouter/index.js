@@ -10,5 +10,7 @@ router.put('/logout', userController.handleLogout);
 router.post('/resetpassword/email', userController.verifyEmail);
 router.post('/business/add', userController.addBusinessController);
 router.get('/business', userController.getBusinessController);
+router.post('/resetpassword/verifycode', userController.SendCodeController);
+router.post('/resetpassword', userController.resetpassConreoller);
 
 module.exports = router;
