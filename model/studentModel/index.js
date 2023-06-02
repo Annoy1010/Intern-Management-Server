@@ -2,7 +2,6 @@ const db = require('../../store');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { send } = require('process');
-const { Console } = require('console');
 
 function hashPass(pass) {
     var hash = crypto.createHash('sha256');
@@ -140,10 +139,97 @@ const getStudentOfYear = (req, res) => {
     });
 }
 
+const getUserId = async (token) => {
+    try {
+        const result = await new Promise((resolve, reject) => {
+            db.query(`
+                SELECT st.id FROM student st, user_account ua, user_person up
+                WHERE st.user_id = up.id and up.username = ua.username and ua.token = '${token}'
+            `,(err, result) => {
+                if (err) {
+                    reject(err);
+                  } else {
+                    resolve(result);
+                  }
+            });
+        });
+        return result[0].id;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+const saveRequestJobIntern = async (userId, jobId, dataJob) => {
+    try {
+        const result = new Promise((resolve, reject) => {
+            db.query(
+              'INSERT INTO intern_job (start_date, submit_status, sent_require_time, job_id, student_id, appreciation_file) VALUES (?, ?, ?, ?, ?, ?)',
+              [dataJob.startDate, false, dataJob.sendRequireTime, jobId, userId, dataJob.appriciationFile],
+              (err, result) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(result);
+                }
+              }
+            );
+          });
+        console.log(result);
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+const saveJobInterest = async (studentId, jobId) => {
+    try {
+        const dateString = new Date().toISOString().substring(0, 10);
+        const result = new Promise((resolve, reject) => {
+            db.query(`
+                INSERT INTO job_favorite (creation_date, student_id, job_id)
+                values ('${dateString}', ${studentId}, ${jobId})`, (err, result) => {
+                    if (err) 
+                        reject(err);
+                    else
+                        resolve(result);
+            })
+        });
+        console.log(result);
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+const getJobInterested = async (studentId) => {
+    try {     
+        const result = new Promise((resolve, reject) => {
+            db.query(`
+                SELECT * FROM job j, job_favorite jf, business bs, user_person up
+                WHERE j.id = jf.job_id and jf.student_id = ${studentId} and j.business_id = bs.id and up.id = bs.user_id`, (err, result) => {
+                    if ( err ) reject(err);
+                    else resolve(result);
+            });
+        });
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+    
+}
+
 module.exports = {
     getALLStudents,
     addStudent,
     updateStudent,
     deleteStudent,
     getStudentOfYear,
+    getUserId,
+    saveRequestJobIntern,
+    saveJobInterest,
+    getJobInterested,
 }

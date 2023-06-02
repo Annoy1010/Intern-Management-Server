@@ -12,6 +12,16 @@ const getJobsController = async (req, res) => {
     return res.send(data);
 }
 
+const getAllJobs = async (req, res) => {
+    try {
+        const result = await businessModel.getAllJobs();
+        return res.status(200).json(result);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
 const addJob = async (req, res) => {
     try {
         const newJob = req.body.newJob;
@@ -47,4 +57,5 @@ const addJob = async (req, res) => {
 module.exports = {
     getJobsController,
     addJob,
+    getAllJobs,
 }

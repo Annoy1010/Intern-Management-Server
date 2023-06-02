@@ -64,8 +64,26 @@ const addJob = async (newJob, businessId) => {
     }
 }
 
+const getAllJobs = async () => {
+    try {        
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT * FROM job`, (err, result)=> {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
 module.exports = {
     getJobsByBusinessId,
     addJob,
     getBusinessId,
+    getAllJobs,
 }
