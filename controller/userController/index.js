@@ -57,6 +57,19 @@ const getBusinessController = (req, res) => {
     userModel.getBusinessModel(req, res);
 }
 
+const putBusinessController = (req, res) => {
+    const data = req.body;
+    const isExistedInvalidValue = Object.keys(data).some(item => data[item] === "" || data[item] === null)
+    if (isExistedInvalidValue) {
+        res.send({
+            statusCode: 400,
+            repsonseData: "Vui lòng nhập đầy đủ thông tin trước khi lưu thay đổi"
+        })
+    } else {
+        userModel.putBusinessModel(data, res);
+    }
+}
+
 module.exports = {
     handleLoginInput,
     handleToken,
@@ -66,4 +79,5 @@ module.exports = {
     verifyEmail,
     addBusinessController,
     getBusinessController,
+    putBusinessController
 }

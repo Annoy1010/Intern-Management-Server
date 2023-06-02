@@ -64,6 +64,25 @@ const postNewJob = (job, res) => {
     })
 }
 
+const putJob = (data, res) => {
+    const { id, job_desc, requirements, another_information, vacancies } = data;
+    db.query(`UPDATE job SET job_desc='${job_desc}', requirements='${requirements}', another_information='${another_information}', vacancies=${Number.parseInt(vacancies)} WHERE id=${id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                res.send({
+                    statusCode: 200, 
+                    responseData: 'Lưu thay đổi thông tin công việc thành công',
+                })
+            }
+        }
+    })
+}
+
 const getSkillsOfJob = (job_id, res) => {
     db.query(`SELECT * FROM skill WHERE job_id = ${job_id}`, (err, result) => {
         if (err) {
@@ -84,5 +103,6 @@ module.exports = {
     getBusinessInfo,
     getAllJobs,
     postNewJob,
+    putJob,
     getSkillsOfJob
 }

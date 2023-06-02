@@ -185,12 +185,47 @@ const addBusiness = (Business, res) => {
 }
 
 const getBusinessModel = (req, res) => {
-    db.query(`SELECT bs.id, ac.username, ps.image, ps.phone, ps.email, ps.address, DATE_FORMAT(bs.establish_date, '%Y-%m-%d') as establish_date, bs.industry_sector, ps.full_name, bs.short_desc FROM business bs, user_account ac, user_person ps WHERE ac.username = ps.username and ps.id = bs.user_id`, (err, result) => {
+    db.query(`SELECT bs.id, ac.username, ps.image, ps.phone, ps.email, ps.address, DATE_FORMAT(bs.establish_date, '%Y-%m-%d') as establish_date, bs.industry_sector, ps.full_name as company_name, bs.short_desc, bs.representator FROM business bs, user_account ac, user_person ps WHERE ac.username = ps.username and ps.id = bs.user_id`, (err, result) => {
         if(err){
             console.log(err);
         }else{
             res.send(result);
             console.log(result);
+        }
+    })
+}
+
+const putBusinessModel = (data, res) => {
+    const {id, address, email, establish_date, company_name, image, industry_sector, phone, representator, short_desc, username} = data;
+    
+    const updateProfileBusiness = () => {
+        db.query(`UPDATE user_person SET address='${address}', image='${image}', email='${email}', full_name='${company_name}', phone='${phone}' WHERE username='${username}'`, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err.toString(),
+                })
+            } else {
+                if (result.affectedRows > 0) {
+                    res.send({
+                        statusCode: 200,
+                        responseData: 'Lưu thay đổi thông tin doanh nghiệp thành công',
+                    })
+                }
+            }
+        })
+    }
+
+    db.query(`UPDATE business SET establish_date='${establish_date}', industry_sector='${industry_sector}', representator='${representator}', short_desc='${short_desc}' WHERE id=${id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString(),
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                updateProfileBusiness();
+            }
         }
     })
 }
@@ -204,4 +239,5 @@ module.exports = {
     verifyEmailModel,
     addBusiness,
     getBusinessModel,
+    putBusinessModel
 }
