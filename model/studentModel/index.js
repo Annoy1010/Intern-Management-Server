@@ -208,7 +208,8 @@ const getJobInterested = async (studentId) => {
     try {     
         const result = new Promise((resolve, reject) => {
             db.query(`
-                SELECT * FROM job j, job_favorite jf, business bs, user_person up
+                SELECT j.id, j.job_name, up.address, bs.industry_sector, j.requirements, up.username
+                FROM job j, job_favorite jf, business bs, user_person up
                 WHERE j.id = jf.job_id and jf.student_id = ${studentId} and j.business_id = bs.id and up.id = bs.user_id`, (err, result) => {
                     if ( err ) reject(err);
                     else resolve(result);

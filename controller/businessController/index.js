@@ -54,8 +54,42 @@ const addJob = async (req, res) => {
     }
 }
 
+const getAllrequest = async (req, res) => {
+    try {
+        const businessId = await businessModel.getBusinessId(req.headers.authorization);
+        if ( !businessId ) return res.status(403).json('user was not found!');
+    
+        const result = await businessModel.getAllrequest(businessId);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+const aceptRequest = async (req, res) => {
+    try {
+        const businessId = await businessModel.getBusinessId(req.headers.authorization);
+        if ( !businessId ) return res.status(403).json('user was not found!');
+    
+        const jobId = req.params.job_id;
+        const studentId = req.body.studentId;
+        const keyInternJob = req.body.keyInternJob;
+    
+        const result = await businessModel.aceptRequest(jobId, studentId, keyInternJob);
+    
+        if ( !result ) return res.status(400).json('failded!');
+    
+        return res.status(200).json('success');
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
 module.exports = {
     getJobsController,
     addJob,
     getAllJobs,
+    getAllrequest,
+    aceptRequest,
 }
