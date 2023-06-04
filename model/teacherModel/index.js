@@ -91,9 +91,50 @@ const postTodo = (regular_id, todo_name, start_date, end_date, res) => {
     })
 }
 
+const postTodoAppreciation = (id, content, res) => {
+    const now = () => {
+        const convertedDate = new Date();
+        return `${convertedDate.getUTCFullYear()}/${convertedDate.getMonth() + 1}/${convertedDate.getDate()}`;
+    }
+
+    db.query(`INSERT INTO todo_appreciation (content, todo_id, created_at) VALUE ('${content}', ${id}, '${now()}')`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                res.send({
+                    statusCode: 200,
+                    responseData: "Gửi đánh giá công việc tới sinh viên thành công"
+                })
+            }
+        }
+    })
+}
+
+const getAllTodoAppreciation = (todo_id, res) => {
+    db.query(`SELECT * FROM todo_appreciation WHERE todo_id=${todo_id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result
+            })
+        }
+    })
+}
+
 module.exports = {
     getTeacher,
     getAssignedList,
     getTodoListOfStudent,
-    postTodo
+    postTodo,
+    postTodoAppreciation,
+    getAllTodoAppreciation
 }

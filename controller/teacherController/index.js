@@ -27,12 +27,28 @@ const postTodoController = (req, res) => {
     }
 }
 
+const postTodoAppreciationController = (req, res) => {
+    const { id, content } = req.body;
+    if (content.trim() === '') {
+        res.send({
+            statusCode: 400,
+            responseData: 'Vui lòng nhập đánh giá trước khi gửi'
+        })
+    } else {
+        teacherModel.postTodoAppreciation(id, content, res);
+    }
+}
 
+const getAllTodoAppreciationController = (req, res) => {
+    const todo_id = req.query.todo_id;
+    teacherModel.getAllTodoAppreciation(todo_id, res);
+}
 
 module.exports = {
     getTeacherController,
     getAssignedListController,
     getTodoListOfStudentController,
     postTodoController,
-
+    postTodoAppreciationController,
+    getAllTodoAppreciationController
 }
