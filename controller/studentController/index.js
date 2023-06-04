@@ -135,6 +135,17 @@ const getCareJobController = (req, res) => {
     studentModel.getCareJob(student_id, res);
 }
 
+const getAllTodoOfStudentController = (req, res) => {
+    const student_id = req.query.student_id;
+    studentModel.getAllTodoOfStudent(student_id, res);
+}
+
+const updateTodoOfStudentController = (req, res) => {
+    const id = req.body.id;
+    const end_date = req.body.end_date
+    studentModel.updateTodoOfStudent(id, end_date, res);
+}
+
 module.exports = {
     getAllStudentsController,
     getStudentIdByUserIdController,
@@ -156,5 +167,7 @@ module.exports = {
     postJobToLibraryController,
     getAllJobsInLibraryController,
     deleteJobFromLibraryController,
-    getCareJobController
+    getCareJobController,
+    getAllTodoOfStudentController,
+    updateTodoOfStudentController
 }

@@ -24,5 +24,7 @@ router.post('/job/store/new', studentController.postJobToLibraryController)
 router.get('/job/library/all', studentController.getAllJobsInLibraryController)
 router.delete('/job/library/delete/id', studentController.deleteJobFromLibraryController)
 router.get('/job/care', studentController.getCareJobController)
+router.get('/todo/all', studentController.getAllTodoOfStudentController)
+router.put('/todo/complete', studentController.updateTodoOfStudentController)
 
 module.exports = router;

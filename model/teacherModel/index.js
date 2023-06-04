@@ -91,6 +91,24 @@ const postTodo = (regular_id, todo_name, start_date, end_date, res) => {
     })
 }
 
+const removeTodo = (id, res) => {
+    db.query(`DELETE FROM detail_todo WHERE id=${id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                res.send({
+                    statusCode: 200,
+                    responseData: 'Gỡ bỏ công việc thành công'
+                })
+            }
+        }
+    })
+}
+
 const postTodoAppreciation = (id, content, res) => {
     const now = () => {
         const convertedDate = new Date();
@@ -130,11 +148,31 @@ const getAllTodoAppreciation = (todo_id, res) => {
     })
 }
 
+const removeAppreciation = (id, res) => {
+    db.query(`DELETE FROM todo_appreciation WHERE id=${id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                res.send({
+                    statusCode: 200,
+                    responseData: 'Gỡ đánh giá khỏi công việc thành công'
+                })
+            }
+        }
+    })
+}
+
 module.exports = {
     getTeacher,
     getAssignedList,
     getTodoListOfStudent,
     postTodo,
+    removeTodo,
     postTodoAppreciation,
-    getAllTodoAppreciation
+    getAllTodoAppreciation,
+    removeAppreciation
 }

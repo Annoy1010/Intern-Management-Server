@@ -526,6 +526,55 @@ const getCareJob  = (student_id, res) => {
     })
 }
 
+const getAllTodoOfStudent = (student_id, res) => {
+    const getAllTodos = id => {
+        db.query(`SELECT * FROM detail_todo WHERE regular_id=${id}`, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err
+                })
+            } else {
+                res.send({
+                    statusCode: 200,
+                    responseData: result,
+                    extraData: id
+                })
+            }
+        })
+    }
+
+    db.query(`SELECT id FROM regular_todo WHERE student_id=${student_id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            const regular_id = result[0].id;
+            getAllTodos(regular_id);
+        }
+    })
+}
+
+const updateTodoOfStudent = (id, end_date, res) => {
+    db.query(`UPDATE detail_todo SET completed_status = 1, out_of_expire=${new Date() > new Date(Date.parse(end_date)) ? 1 : 0} WHERE id=${id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                res.send({
+                    statusCode: 200,
+                    responseData: 'Bạn vừa hoàn thành xong công việc này',
+                })
+            }
+        }
+    })
+}
+
 module.exports = {
     getALLStudents,
     getStudentIdByUserId,
@@ -547,5 +596,7 @@ module.exports = {
     postJobToLibrary,
     getAllJobsInLibrary,
     deleteJobFromLibrary,
-    getCareJob
+    getCareJob,
+    getAllTodoOfStudent,
+    updateTodoOfStudent
 }

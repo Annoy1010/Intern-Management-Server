@@ -27,6 +27,11 @@ const postTodoController = (req, res) => {
     }
 }
 
+const removeTodoController = (req, res) => {
+    const id = req.query.id;
+    teacherModel.removeTodo(id, res);
+}
+
 const postTodoAppreciationController = (req, res) => {
     const { id, content } = req.body;
     if (content.trim() === '') {
@@ -44,11 +49,18 @@ const getAllTodoAppreciationController = (req, res) => {
     teacherModel.getAllTodoAppreciation(todo_id, res);
 }
 
+const removeAppreciationController = (req, res) => {
+    const id = req.query.id;
+    teacherModel.removeAppreciation(id, res);
+}
+
 module.exports = {
     getTeacherController,
     getAssignedListController,
     getTodoListOfStudentController,
     postTodoController,
+    removeTodoController,
     postTodoAppreciationController,
-    getAllTodoAppreciationController
+    getAllTodoAppreciationController,
+    removeAppreciationController
 }
