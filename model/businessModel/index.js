@@ -16,6 +16,28 @@ const getBusinessInfo = (user_id, res) => {
     })
 }
 
+const getBusinessId = async (token) => {
+    try {
+        console.log(token);
+        const result = await new Promise((resolve, reject) => {
+          db.query(`SELECT bs.id 
+                    FROM business bs, user_account ua, user_person up 
+                    WHERE bs.user_id = up.id and up.username = ua.username and ua.token = '${token}'`, (err, result) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(result);
+            }
+          });
+        });
+        console.log(result);
+        return result[0].id;
+      } catch (error) {
+        console.log(error);
+        return 0;
+      }
+}
+
 const getAllJobs = (business_id, res) => {
     db.query(`SELECT * FROM job WHERE business_id=${business_id}`, (err, result) => {
         if (err) {
@@ -99,10 +121,84 @@ const getSkillsOfJob = (job_id, res) => {
     })
 }
 
+const getAllrequest = async (businessId) => {
+    try {
+        return new Promise((resolve, reject) => {
+            db.query(`
+                select st.id, up.image, up.full_name, j.job_name, ij.job_id, ij.id AS keyInternJob 
+                from intern_job ij, job j, student st, user_person up 
+                where ij.job_id = j.id and j.business_id = ${businessId} 
+                    and ij.student_id = st.id and st.user_id = up.id
+                    and ij.submit_status = 0;
+            `, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
+    } catch (error) {
+        console.log(error);
+        throw error;
+    } 
+}
+
+const aceptRequest = async (jobId, studentId, keyInternJob) => {
+    try {
+        
+        return new Promise((resolve, reject) => {
+            db.query(`
+                UPDATE intern_job ij 
+                SET ij.submit_status = TRUE 
+                WHERE ij.job_id = ${jobId} and ij.student_id = ${studentId} 
+                    and ij.id = ${keyInternJob};
+            `, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+const getAllInternOfBusiness = async (businessId) => {
+    try {
+        return new Promise((resolve, reject) => {
+            db.query(`
+            SELECT sc.school_name , up.phone, up.email, ij.sent_require_time, up.address, up.full_name, j.job_name, ij.start_date 
+            FROM intern_job ij, job j, student st, user_person up, class cl, department dp, school sc
+            WHERE ij.job_id = j.id and j.business_id = ${businessId} 
+                and ij.student_id = st.id and st.user_id = up.id 
+                and ij.submit_status = ${1} and st.class_id = cl.id 
+                and cl.department_id = dp.id and dp.school_id = sc.id;
+            `, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
 module.exports = {
     getBusinessInfo,
     getAllJobs,
     postNewJob,
     putJob,
-    getSkillsOfJob
+    getSkillsOfJob,
+    getBusinessId,
+    getAllrequest,
+    aceptRequest,
+    getAllInternOfBusiness,
 }
