@@ -9,7 +9,7 @@ router.get('/account/data', userController.handleUserAccountDataByToken);
 router.get('/person/data', userController.handleUserPersonDataByToken);
 router.put('/logout', userController.handleLogout);
 router.post('/resetpassword/email', userController.verifyEmail);
-router.post('/business/add', userController.addBusinessController);
+router.post('/business', userController.saveBusiness);
 router.get('/business/all', userController.getBusinessController);
 router.put('/business/edit', userController.putBusinessController);
 

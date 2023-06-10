@@ -267,5 +267,5 @@ module.exports = {
     handleTeacherDetail,
     handlePostSubject,
     handleGetSubject,
-    handlePutSubject
+    handlePutSubject,
 }
