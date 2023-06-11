@@ -546,6 +546,46 @@ const getSubjectByAllFilter = (semester_id, academic_year, res) => {
     })
 }
 
+const confirmLearnIntern = async (studentId, key) => {
+    try {
+        const query = `UPDATE student_learn_intern SET regist_status = 1 WHERE student_id = ${studentId} and id = ${key}`;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+const getStudentSignUpIntern = async ({academic, semester, teacher}) => {
+    try {
+            query= `SELECT st.id, upst.image as 'studentImage' , upst.full_name as 'studentName',
+                        uptc.full_name as 'teacherName', cl.class_name as 'className',
+                        uptc.image as 'teacherImage', dp.department_name as 'teacherDepartmentName', uptc.email as 'teacherEmail', sti.id as 'key'
+                    FROM student_learn_intern sti, student st, teacher tc, user_person upst, user_person uptc, intern_subject isub, class cl, department dp
+                    where sti.student_id = st.id and sti.subject_id = isub.id 
+                        and isub.teacher_id = tc.id and upst.id = st.user_id 
+                        and uptc.id = tc.user_id and st.class_id = cl.id
+                        and tc.department_id = dp.id and sti.regist_status = 0
+                        and (isub.teacher_id = tc.id) and (isub.academic_year = ${academic} OR ${academic} = 0 )
+                        and (isub.semester_id = ${semester} OR ${semester} = 0 ) and (tc.user_id = ${teacher} OR ${teacher} = 0);`;
+                        
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
 module.exports = {
     getSchool,
     getAllProgram,
@@ -571,5 +611,7 @@ module.exports = {
     getAllSubject,
     getSubjectBySemester,
     getSubjectByAcademicYear,
-    getSubjectByAllFilter
+    getSubjectByAllFilter,
+    getStudentSignUpIntern,
+    confirmLearnIntern,
 }

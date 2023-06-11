@@ -1,4 +1,5 @@
 const adminModel = require("../../model/adminModel");
+const Joi = require('joi');
 
 const handleGetSchool = (req, res) => {
     const email = req.query.email;
@@ -247,6 +248,44 @@ const handlePutSubject = (req, res) => {
     }
 }
 
+const confirmLearnIntern = async (req, res) => {
+    
+    try {
+        const studentId = req.params.id;
+        const key = req.body.key;
+        if (!studentId) return res.status(400).json('Không tìm thấy sinh viên nào');
+        if (!key) return res.status(400).json('Lỗi không thể xác nhận đăng ký thực tập');
+        
+        const result = await adminModel.confirmLearnIntern(studentId, key);
+        return res.status(200).json('Xác nhận thành công');
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ detail: e.message }); 
+    }
+}
+
+const getStudentSignUpIntern = async (req, res) => {
+    try {        
+        const schema = Joi.object({
+            academic: Joi.number().default(0),
+            semester: Joi.number().default(0),
+            teacher: Joi.number().default(0),
+        });
+    
+        const {error, value} = schema.validate(req.query);
+    
+        if (error) return res.status(400).json(error);
+        console.log(req.query);
+    
+        const result = await adminModel.getStudentSignUpIntern(value);
+    
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ detail: e.message });        
+    }
+}
+
 module.exports = {
     handleGetSchool,
     handleGetProgram,
@@ -268,4 +307,6 @@ module.exports = {
     handlePostSubject,
     handleGetSubject,
     handlePutSubject,
+    getStudentSignUpIntern,
+    confirmLearnIntern,
 }

@@ -30,4 +30,7 @@ router.post('/subject/new', adminController.handlePostSubject);
 router.get('/subject', adminController.handleGetSubject);
 router.put('/subject/edit', adminController.handlePutSubject);
 
+router.get('/student/signup_intern', adminController.getStudentSignUpIntern);
+router.put('/student/:id/confirm_learn_intern', adminController.confirmLearnIntern);
+
 module.exports = router;
