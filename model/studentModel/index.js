@@ -216,8 +216,8 @@ const getAllOpeningSubject = (year, month, department_id, res) => {
 }
 
 const checkRegistLearnSubjectRequest = (student_id, res) => {
-    const handleRequestPending = () => {
-        db.query(`SELECT * FROM student_learn_intern si, student s WHERE si.student_id=s.id AND s.user_id=${student_id} AND si.regist_status = 0`, (err, result) => {
+    const handleActiveLearning = () => {
+        db.query(`SELECT * FROM student_learn_intern si, student s WHERE si.student_id=s.id AND s.user_id=${student_id} AND si.regist_status = 1 AND is_learning = 1 AND passed_status = 0`, (err, result) => {
             if (err) {
                 res.send({
                     statusCode: 400,
@@ -227,7 +227,7 @@ const checkRegistLearnSubjectRequest = (student_id, res) => {
                 if (result.length > 0) {
                     res.send({
                         statusCode: 400,
-                        responseData: 'Bạn đã đăng ký môn học trước đó. Vui lòng chờ xác nhận hoặc xóa yêu cầu trước khi đăng ký lớp học khác'
+                        responseData: 'Bạn không thể đăng ký khi hiện tại bạn đang trong quá trình học môn này'
                     })
                 } else {
                     db.query(`SELECT id FROM student WHERE user_id=${student_id}`, (err, result) => {
@@ -243,6 +243,26 @@ const checkRegistLearnSubjectRequest = (student_id, res) => {
                             })
                         }
                     })
+                }
+            }
+        })
+    }
+
+    const handleRequestPending = () => {
+        db.query(`SELECT * FROM student_learn_intern si, student s WHERE si.student_id=s.id AND s.user_id=${student_id} AND si.regist_status = 0`, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err.toString()
+                })
+            } else {
+                if (result.length > 0) {
+                    res.send({
+                        statusCode: 400,
+                        responseData: 'Bạn đã đăng ký môn học trước đó. Vui lòng chờ xác nhận hoặc xóa yêu cầu trước khi đăng ký lớp học khác'
+                    })
+                } else {
+                    handleActiveLearning();
                 }
             }
         })
