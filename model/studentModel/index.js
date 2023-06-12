@@ -10,7 +10,7 @@ function hashPass(pass) {
 }
 
 const getALLStudents = (req, res) => {
-    db.query(`SELECT s.user_id, s.id as student_id, ps.image, ps.full_name, s.dob, ps.email, ps.address, s.class_id, c.class_name, s.major_id, d.id, s.current_status FROM student s, user_person ps, class c, department d WHERE s.user_id = ps.id and c.department_id = d.id and s.class_id = c.id`, (err, result) => {
+    db.query(`SELECT s.user_id, s.id as student_id, ps.image, ps.full_name, s.dob, ps.email, ps.address, s.class_id, c.class_name, s.major_id, d.id as department_id, s.current_status FROM student s, user_person ps, class c, department d WHERE s.user_id = ps.id and c.department_id = d.id and s.class_id = c.id`, (err, result) => {
         if(err){
             console.log(err);
         }else{
@@ -57,7 +57,7 @@ const addStudent = (req, res) => {
                 if(err){
                     console.log(err)
                 }else{
-                    db.query(`INSERT INTO user_person (username, full_name, image, phone, email, address) values ('${email}', '${full_name}', '${image}', '${0987654321}', '${email}', '${address}')`, (err, result) => {
+                    db.query(`INSERT INTO user_person (username, full_name, image, phone, email, address) values ('${email}', '${full_name}', '${image}', '0987654321', '${email}', '${address}')`, (err, result) => {
                         if(err){
                             console.log(err)
                         }else{
@@ -90,6 +90,12 @@ const updateStudent = (req, res) => {
         class_id,
         major_id } = req.body.newStudent;
     const id = req.body.user_id;
+
+    const formatedDate = date => {
+        const convertedDate = new Date(Date.parse(date));
+        return `${convertedDate.getUTCFullYear()}/${convertedDate.getMonth() + 1}/${convertedDate.getDate()}`;
+    }
+
     db.query(`SELECT email FROM user_person WHERE email = '${email}' and id != ${id}`, (err, result) => {
         if(result.length != 0){
             res.send({
@@ -97,7 +103,7 @@ const updateStudent = (req, res) => {
                 responseData: 'Email đã được sử dụng, vui lòng sử dụng email khác',
             });
         } else{
-            db.query(`UPDATE student SET dob = '${dob}', class_id = ${class_id}, major_id = ${major_id} WHERE user_id = ${id}`, (err, result) => {
+            db.query(`UPDATE student SET dob = '${formatedDate(dob)}', class_id = ${class_id}, major_id = ${major_id} WHERE user_id = ${id}`, (err, result) => {
                 if(err){
                     console.log(err);
                 }else{

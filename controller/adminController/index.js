@@ -94,6 +94,10 @@ const handleGetTeacherInDepartment = (req, res) => {
     adminModel.getAllTeachersInDepartment(req, res);
 }
 
+const handleGetActiveTeacherInDepartment = (req, res) => {
+    adminModel.getAllActiveTeachersInDepartment(req, res);
+}
+
 const handlePostDepartment = (req, res) => {
     const department_name = req.body.department_name;
     const major_list = req.body.major_list;
@@ -247,6 +251,60 @@ const handlePutSubject = (req, res) => {
     }
 }
 
+const handlePostInternBoard = (req, res) => {
+    const { president, secretary, asker, academic_year, semester_id, department_id } = req.body;
+    const data = {
+        president,
+        secretary,
+        asker,
+        academic_year,
+        semester_id,
+        department_id
+    };
+    const keys = Object.keys(data);
+    const IsExistedNullInput = keys.some(item => data[item] === null || data[item] === 0);
+    if (IsExistedNullInput) {
+        res.send({
+            statusCode: 400,
+            responseData: 'Vui lòng nhập đầy đủ thông tin'
+        })
+    } else {
+        adminModel.postInternBoard(data, res);
+    }
+}
+
+const handlePutInternBoard = (req, res) => {
+    const { id, president, secretary, asker, academic_year, semester_id, department_id } = req.body;
+    const data = {
+        id,
+        president,
+        secretary,
+        asker,
+        academic_year,
+        semester_id,
+        department_id
+    };
+    const keys = Object.keys(data);
+    const IsExistedNullInput = keys.some(item => data[item] === null || data[item] === 0);
+    if (IsExistedNullInput) {
+        res.send({
+            statusCode: 400,
+            responseData: 'Vui lòng nhập đầy đủ thông tin'
+        })
+    } else {
+        adminModel.putInternBoard(data, res);
+    }
+}
+
+const handleDeleteInternBoard = (req, res) => {
+    const id = req.query.id;
+    adminModel.deleteInternBoard(id, res);
+}
+
+const handleGetAllInternBoards = (req, res) => {
+    adminModel.getAllInternBoards(req, res);
+}
+
 module.exports = {
     handleGetSchool,
     handleGetProgram,
@@ -260,6 +318,7 @@ module.exports = {
     handleRemoveMajor,
     handleGetTeacher,
     handleGetTeacherInDepartment,
+    handleGetActiveTeacherInDepartment,
     handlePostDepartment,
     handlePutDepartment,
     handlePostTeacherAccount,
@@ -267,5 +326,9 @@ module.exports = {
     handleTeacherDetail,
     handlePostSubject,
     handleGetSubject,
-    handlePutSubject
+    handlePutSubject,
+    handlePostInternBoard,
+    handlePutInternBoard,
+    handleDeleteInternBoard,
+    handleGetAllInternBoards
 }

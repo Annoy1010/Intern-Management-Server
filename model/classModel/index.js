@@ -61,7 +61,7 @@ const getClassYearModel = (req, res) => {
 }
 
 const getAcademicYear = (req, res) => {
-    db.query('SELECT DISTINCT academic_year FROM class', (err, result) => {
+    db.query('SELECT * FROM academic_year', (err, result) => {
         if(err){
             console.log(err);
         }else{

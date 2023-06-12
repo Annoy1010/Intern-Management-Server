@@ -1,3 +1,4 @@
+const { error } = require('console');
 const db = require('../../store');
 const crypto = require('crypto');
 
@@ -224,6 +225,23 @@ const getAllTeachersInDepartment = (req, res) => {
     })
 }
 
+const getAllActiveTeachersInDepartment = (req, res) => {
+    const department_id = req.query.departmentId;
+    db.query(`SELECT t.id, up.full_name FROM teacher t, user_person up WHERE t.user_id = up.id AND t.department_id=${department_id} AND t.current_status=1`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            res.send({
+                statusCode: 200,
+                responseData: result,
+            })
+        }
+    })
+}
+
 const insertMajor = (major_item, department_id, successfulRows) => {
     db.query(`INSERT INTO major (major_name, department_id) VALUES (N'${major_item}', ${department_id})`, (err, result) => {
         if (err) {
@@ -294,7 +312,7 @@ const editDepartment = (req, res) => {
 }
 
 const getAllTeacher = (req, res) => {
-    db.query("SELECT * FROM teacher t, user_person up WHERE t.user_id = up.id", (err, result) => {
+    db.query("SELECT t.id, t.dob, t.start_date, t.education_level, t.experience_year, t.current_status, t.user_id, t.department_id, up.full_name, up.image, up.phone, up.email, up.address, up.username  FROM teacher t, user_person up WHERE t.user_id = up.id", (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,
@@ -404,7 +422,7 @@ const putTeacherPersonal = (data, res) => {
 const putTeacherDetail = (data, res) => {
     const convertDateToDB = (date) => {
         const createdDate = new Date(date);
-        const convertedDate = `${createdDate.getFullYear()}/${createdDate.getMonth()}/${createdDate.getDate()}`;
+        const convertedDate = `${createdDate.getFullYear()}/${createdDate.getMonth() + 1}/${createdDate.getDate()}`;
         return convertedDate;
     }
 
@@ -546,6 +564,157 @@ const getSubjectByAllFilter = (semester_id, academic_year, res) => {
     })
 }
 
+const postInternBoard = (data, res) => {
+    const {president, secretary, asker, academic_year, semester_id, department_id} = data;
+
+    if ( president === secretary ) {
+        res.send({
+            statusCode: 400,
+            responseData: 'Chủ tịch và Thư ký phải khác nhau',
+        })
+        return;
+    }
+
+    if (president === asker ) { 
+        res.send({
+            statusCode: 400,
+            responseData: 'Chủ tịch và Người phản biện phải khác nhau',
+        })
+        return;
+    }
+
+    if (secretary === asker ) { 
+        res.send({
+            statusCode: 400,
+            responseData: 'Thư ký và Người phản biện phải khác nhau',
+        })
+        return;
+    }
+
+    const createInternBoard = () => {
+        const date = new Date();
+        const now = `${date.getUTCFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+        db.query(`INSERT INTO examination_board (president, secretary, asker, academic_year, semester_id, department_id, creation_date) VALUES (${president}, ${secretary}, ${asker}, ${academic_year}, ${semester_id}, ${department_id}, '${now}')`, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err,
+                })
+            } else {
+                res.send({
+                    statusCode: 200,
+                    responseData: 'Lập hội đồng chấm thi thành công',
+                })
+            }
+        })
+    }
+
+    db.query(`SELECT * FROM examination_board WHERE academic_year = ${academic_year} AND semester_id = ${semester_id} AND department_id = ${department_id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            if (result.length > 0) {
+                res.send({
+                    statusCode: 400,
+                    responseData: 'Hội đồng chấm thi của khoa đã tồn tại đối với học kỳ và năm học này',
+                })
+            } else {
+                createInternBoard();
+            }
+        }
+    })
+}
+
+const putInternBoard = (data, res) => {
+    const {id, president, secretary, asker, academic_year, semester_id, department_id} = data;
+
+    if ( president === secretary ) {
+        res.send({
+            statusCode: 400,
+            responseData: 'Chủ tịch và Thư ký phải khác nhau',
+        })
+        return;
+    }
+
+    if (president === asker ) { 
+        res.send({
+            statusCode: 400,
+            responseData: 'Chủ tịch và Người phản biện phải khác nhau',
+        })
+        return;
+    }
+
+    if (secretary === asker ) { 
+        res.send({
+            statusCode: 400,
+            responseData: 'Thư ký và Người phản biện phải khác nhau',
+        })
+        return;
+    }
+
+    db.query(`UPDATE examination_board SET president=${president}, secretary=${secretary}, asker=${asker}, academic_year=${academic_year}, semester_id=${semester_id}, department_id=${department_id} WHERE id=${id} `, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                res.send({
+                    statusCode: 200,
+                    responseData: 'Cập nhật thông tin hội đồng chấm thi thành công',
+                })
+            }
+        }
+    })
+}
+
+const deleteInternBoard = (id, res) => {
+    db.query(`DELETE FROM examination_board WHERE id=${id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            if (result.affectedRows > 0) {
+                res.send({
+                    statusCode: 200,
+                    responseData: 'Xóa thông tin hội đồng chấm thi thành công'
+                });
+            }
+        }
+    })
+}
+
+const getAllInternBoards = (req, res) => {
+    const filter = req.query;
+    const { semester_id, academic_year, department_id} = filter;
+    db.query(`SELECT * FROM examination_board WHERE semester_id=${semester_id} AND academic_year=${academic_year} AND department_id=${department_id}`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err,
+            })
+        } else {
+            if (result.length > 0) {
+                res.send({
+                    statusCode: 200,
+                    responseData: result[0],
+                })
+            } else {
+                res.send({
+                    statusCode: 404,
+                    responseData: {},
+                })
+            }
+        }
+    })
+}
+
 module.exports = {
     getSchool,
     getAllProgram,
@@ -555,6 +724,7 @@ module.exports = {
     getSemester,
     getAllDepartment,
     getAllTeachersInDepartment,
+    getAllActiveTeachersInDepartment,
     postNewDepartment,
     editDepartment,
     getDepartmentHead,
@@ -571,5 +741,9 @@ module.exports = {
     getAllSubject,
     getSubjectBySemester,
     getSubjectByAcademicYear,
-    getSubjectByAllFilter
+    getSubjectByAllFilter,
+    postInternBoard,
+    putInternBoard,
+    deleteInternBoard,
+    getAllInternBoards
 }

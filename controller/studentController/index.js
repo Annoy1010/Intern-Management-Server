@@ -43,7 +43,7 @@ const updateStudentController = (req, res) => {
             statusCode: 400,
             responseData: 'Vui lòng điền đầy đủ thông tin',
         });
-    }else{
+    } else{
         studentModel.updateStudent(req, res);
     }
 }

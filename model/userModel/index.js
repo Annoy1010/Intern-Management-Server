@@ -116,72 +116,114 @@ const verifyEmailModel = (email, res) => {
     })
 }
 
-const addBusiness = (Business, res) => {
-    const username = Business.name;
-    const pass = hashPass('123456');
-    const permission_id = 4;
-    const email = Business.email;
-    const representator = Business.representator;
-    const sector = Business.sector;
-    const desc = Business.desc;
-    const phone = Business.phone;
-    const address = Business.address;
-    const img = Business.img;
-    db.query(`SELECT username FROM user_account WHERE username = '${username}'`, (err, result) => {
-        if(err){
-            console.log(err);
-        }else{
-            if (result.length !== 0){
-                res.send({
-                    statusCode: 401,
-                    responseData: 'Tên công ty hoặc email đã được sử dụng',
-                })
-            }else{
-                db.query(`SELECT email FROM user_person WHERE email = '${email}'`, (err, result) => {
-                    if(err){
-                        console.log(err);
-                    }else{
-                        if (result.length !== 0){
-                            res.send({
-                                statusCode: 401,
-                                responseData: 'Tên công ty hoặc email đã được sử dụng',
-                            })
-                        }else{
-                            db.query(`INSERT INTO user_account (username, pass, permission_id) values ('${username}','${pass}', ${permission_id})`, (err, result) => {
-                                if (err) {
-                                    res.send({
-                                        statusCode: 402,
-                                        responseData: 'Tên công ty đã được sử dụng',
-                                    }
-                                );
-                                } else {
-                                    res.send({
-                                            statusCode: 200,
-                                            responseData: 'Lưu thành công',
-                                        }
-                                    );
-                                }
-                            })
 
-                            db.query(`INSERT INTO user_person (username, full_name, phone, email, address, image) values('${username}', '${representator}', '${phone}', '${email}', '${address}', '${img}')`, (err, result) => {
-                                if(err){
-                                    console.log(err);
-                                }else{
-                                    db.query(`INSERT INTO business (establish_date ,industry_sector, representator, short_desc, user_id) VALUES('2023-01-01', '${sector}', '${representator}', '${desc}', ${result.insertId})`, (err, result) => {
-                                        if(err){
-                                            console.log(err);
-                                        }else{
-                                            console.log(result);
-                                        }
-                                    })
-                                }
-                            })
-                        }
-                    }
-                })
-            }
-        }
-    })
+const getBusinessByBusinessId = async (businessId) => {
+    try {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT bs.id, ac.username, ps.image, ps.phone, ps.email, ps.address, DATE_FORMAT(bs.establish_date, '%Y-%m-%d') as establish_date, bs.industry_sector, ps.full_name as company_name, bs.short_desc, bs.representator FROM business bs, user_account ac, user_person ps WHERE ac.username = ps.username and ps.id = bs.user_id and bs.id = ${businessId}`, (err, result) => {
+                if(err){
+                    reject(err);
+                }else{
+                    resolve(result);
+                }
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+
+const checkEmail = async (email) => {
+    try {        
+        const query = `SELECT * FROM user_person WHERE email = '${email}'`
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) 
+                    reject(err);
+                else 
+                    resolve(result);
+
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+const checkUserName = async (username) => {
+    try {        
+        const query = `SELECT * FROM user_account WHERE username = '${username}'`
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) 
+                    reject(err);
+                else 
+                    resolve(result);
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+const saveAccount = async (account) => {
+    try {        
+        const query = `INSERT INTO user_account (username, pass, permission_id) 
+                        values ('${account.userName}', '${hashPass(account.pass)}', '${account.permissionsId}')`;
+
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) 
+                    reject(err);
+                else 
+                    resolve(result);
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+const savePerson = async (person) => {
+    try {        
+        const query = `INSERT INTO user_person (username, full_name, phone, image, email, address)
+                        values ('${person.userName}', '${person.fullName}', '${person.phone}', '${person.image}', '${person.email}', '${person.address}')`;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) 
+                    reject(err);
+                else 
+                    resolve(result);
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+const saveBusiness = async (business) => {
+    try {
+        const date = new Date().toISOString().slice(0, 10);
+        const query = `INSERT INTO business (establish_date, industry_sector, representator, short_desc, user_id)
+                        values ('${business.establishDate}', '${business.industrySector}', '${business.representator}', '${business.shortDesc}', '${business.userId}')`;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) 
+                    reject(err);
+                else 
+                    resolve(result);
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
 }
 
 const getBusinessModel = (req, res) => {
@@ -237,7 +279,12 @@ module.exports = {
     getUserPersonData,
     resetToken,
     verifyEmailModel,
-    addBusiness,
+    checkEmail,
+    checkUserName,
+    saveAccount,
+    savePerson,
+    saveBusiness,
     getBusinessModel,
-    putBusinessModel
+    putBusinessModel,
+    getBusinessByBusinessId
 }
