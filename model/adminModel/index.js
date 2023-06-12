@@ -586,6 +586,46 @@ const getStudentSignUpIntern = async ({academic, semester, teacher}) => {
     }
 }
 
+const getStudentRequestJobIntern = async ({academic, semester}) => {
+    try {
+        const query = ` SELECT upst.image as 'studentImage', upst.full_name as 'studentName', j.job_name as 'position', st.id as 'studentId', srri.id as 'key',
+                               uptc.image as 'teacherImage', uptc.full_name as 'teacherName', dp.department_name as 'departmentName', uptc.email as 'teacherEmail'
+                        FROM student_request_regist_intern srri, student st, teacher tc, 
+                             user_person upst, user_person uptc, job j, intern_subject isub,
+                             department dp, student_learn_intern sli 
+                        WHERE srri.student_id = st.id and st.user_id = upst.id
+                            and srri.job_id = j.id and st.id = sli.student_id
+                            and sli.subject_id = isub.id and isub.teacher_id = tc.id 
+                            and tc.user_id = uptc.id and tc.department_id = dp.id and srri.regist_submit_status = 2;`;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+const confirmInternJobRequested = async (file, key) => {
+    try {
+        const query = `UPDATE student_request_regist_intern
+                       SET file = '${file}', regist_submit_status = 1
+                       WHERE id = ${key}`;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
 module.exports = {
     getSchool,
     getAllProgram,
@@ -614,4 +654,6 @@ module.exports = {
     getSubjectByAllFilter,
     getStudentSignUpIntern,
     confirmLearnIntern,
+    getStudentRequestJobIntern,
+    confirmInternJobRequested,
 }

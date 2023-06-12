@@ -1,6 +1,7 @@
 const adminModel = require("../../model/adminModel");
 const Joi = require('joi');
 
+
 const handleGetSchool = (req, res) => {
     const email = req.query.email;
     if (!email) {
@@ -275,7 +276,6 @@ const getStudentSignUpIntern = async (req, res) => {
         const {error, value} = schema.validate(req.query);
     
         if (error) return res.status(400).json(error);
-        console.log(req.query);
     
         const result = await adminModel.getStudentSignUpIntern(value);
     
@@ -283,6 +283,45 @@ const getStudentSignUpIntern = async (req, res) => {
     } catch (e) {
         console.log(e);
         return res.status(500).json({ detail: e.message });        
+    }
+}
+
+const getStudentRequestJobIntern = async (req, res) => {
+    try {
+        const schema = Joi.object({
+            academic: Joi.number().default(0),
+            semester: Joi.number().default(0),
+        });
+    
+        const {error, value} = schema.validate(req.query);
+    
+        if (error) return res.status(400).json(error);
+
+        const result = await adminModel.getStudentRequestJobIntern(value);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.message});
+    }
+}
+
+const confirmInternJobRequested = async (req, res) => {
+    try {
+        if (!req.file) {
+            throw new Error('No file uploaded');
+        }
+        
+        console.log(req);
+        const file = req.file.buffer;
+        const key = req.body.key;
+        const result = await adminModel.confirmInternJobRequested(file, key);
+        console.log(result);
+    
+        return res.status(200).json('xac nhan thanh cong');
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.message});
     }
 }
 
@@ -309,4 +348,6 @@ module.exports = {
     handlePutSubject,
     getStudentSignUpIntern,
     confirmLearnIntern,
+    getStudentRequestJobIntern,
+    confirmInternJobRequested,
 }
