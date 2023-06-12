@@ -270,7 +270,7 @@ const checkRegistLearnSubjectRequest = (student_id, res) => {
 const postRegistLearnSubjectRequest = (student_id, subject_id, res) => {
     const date = new Date();
     const currentDate = `${date.getUTCFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
-    db.query(`INSERT INTO student_learn_intern(passed_status, regist_date, regist_status, student_id, subject_id) VALUE (0, '${currentDate}', 0, ${student_id}, ${subject_id})`, (err, result) => {
+    db.query(`INSERT INTO student_learn_intern (passed_status, regist_date, regist_status, student_id, subject_id, is_learning) VALUE (0, '${currentDate}', 0, ${student_id}, ${subject_id}, 0)`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,
@@ -557,8 +557,16 @@ const getAllTodoOfStudent = (student_id, res) => {
                 responseData: err,
             })
         } else {
-            const regular_id = result[0].id;
-            getAllTodos(regular_id);
+            if (result.length > 0) {
+                const regular_id = result[0].id;
+                getAllTodos(regular_id);
+            } else {
+                res.send({
+                    statusCode: 200,
+                    responseData: [],
+                    extraData: null
+                })
+            }
         }
     })
 }

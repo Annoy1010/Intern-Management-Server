@@ -55,6 +55,30 @@ const getTodoListOfStudent = (student_id, user_id, res) => {
         })
     }
 
+    const createTodoPlace = () => {
+        db.query(`SELECT id FROM teacher WHERE user_id=${user_id}`, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err
+                })
+            } else {
+                const teacher_id = result[0].id;
+                db.query(`INSERT INTO regular_todo (student_id, teacher_id) VALUES (${student_id}, ${teacher_id})`, (err, result) => {
+                    if (err) {
+                        res.send({
+                            statusCode: 400,
+                            responseData: err
+                        })
+                    } else {
+                        const regular_id = result.insertId;
+                        getAllTodos(regular_id)
+                    }
+                })
+            }
+        })
+    }
+
     db.query(`SELECT r.id FROM regular_todo r, teacher t WHERE r.student_id=${student_id} AND t.user_id=${user_id} AND r.teacher_id=t.id`, (err, result) => {
         if (err) {
             res.send({
@@ -62,8 +86,12 @@ const getTodoListOfStudent = (student_id, user_id, res) => {
                 responseData: err
             })
         } else {
-            const regular_id = result[0].id;
-            getAllTodos(regular_id);
+            if (result.length > 0) {
+                const regular_id = result[0].id;
+                getAllTodos(regular_id);
+            } else {
+                createTodoPlace()
+            }
         }
     })
 }
