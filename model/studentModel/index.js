@@ -392,6 +392,25 @@ const getAllRegistInternJobRequest = (student_id, res) => {
             res.send({ 
                 statusCode: 200, 
                 responseData: result,
+            });
+        }
+    })
+}
+
+const getAllRequestJobIntern = (student_id, res) => {
+    db.query(`SELECT sr.id, up.full_name as company_name, j.job_name, sr.submit_status, sr.sent_require_time 
+                FROM intern_job sr, job j, business b, user_person up 
+                WHERE sr.student_id = ${student_id} AND sr.job_id=j.id 
+                    AND j.business_id=b.id AND b.user_id=up.id`, (err, result) => {
+        if (err) {
+            res.send({
+                statusCode: 400,
+                responseData: err.toString()
+            })
+        } else {
+            res.send({ 
+                statusCode: 200, 
+                responseData: result,
             })
         }
     })
@@ -598,5 +617,6 @@ module.exports = {
     deleteJobFromLibrary,
     getCareJob,
     getAllTodoOfStudent,
-    updateTodoOfStudent
+    updateTodoOfStudent,
+    getAllRequestJobIntern,
 }

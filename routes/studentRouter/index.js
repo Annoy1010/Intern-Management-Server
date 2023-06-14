@@ -17,6 +17,7 @@ router.get('/intern/subject/info', studentController.getRegistedSubjectInfoContr
 router.delete('/intern/subject/delete/id', studentController.deleteRegistSubjectController);
 router.post('/intern/job/regist/new', studentController.postRegistInternJobRequestController);
 router.get('/intern/job/regist/all', studentController.getAllRegistInternJobRequestController);
+router.get('/intern/job/request', studentController.getAllRequestJobIntern);
 router.delete('/intern/job/regist/id', studentController.deleteRegistInternJobRequestController);
 router.get('/job/all', studentController.getAllJobsController)
 router.get('/job/store', studentController.getJobInLibraryOfStudentController)
