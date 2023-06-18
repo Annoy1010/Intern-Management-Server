@@ -6,6 +6,7 @@ const teacherRouter = require('./teacherRouter');
 const studentRouter = require('./studentRouter');
 const majorRouter = require('./majorRouter');
 const businessRouter = require('./businessRouter');
+const chatRouter = require('./chatRouter');
 
 function route(app) {
     app.use('/user', userRouter);
@@ -16,6 +17,8 @@ function route(app) {
     app.use('/student', studentRouter);
     app.use('/major', majorRouter);
     app.use('/business', businessRouter);
+    app.use('/chat', chatRouter);
+
 }
 
 module.exports = route;

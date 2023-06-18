@@ -57,7 +57,7 @@ const addStudent = (req, res) => {
                 if(err){
                     console.log(err)
                 }else{
-                    db.query(`INSERT INTO user_person (username, full_name, image, phone, email, address) values ('${email}', '${full_name}', '${image}', '${0987654321}', '${email}', '${address}')`, (err, result) => {
+                    db.query(`INSERT INTO user_person (username, full_name, image, phone, email, address) values ('${email}', '${full_name}', '${image}', '0987654321', '${email}', '${address}')`, (err, result) => {
                         if(err){
                             console.log(err)
                         }else{
