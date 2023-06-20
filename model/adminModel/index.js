@@ -795,6 +795,46 @@ const confirmInternJobRequested = async (file, key) => {
     }
 }
 
+const getInfoRequestOfstudent = async (id) => {
+    try {
+        const query = `SELECT student_id as 'studentId', job_id as 'jobId', regist_date as 'registDate' 
+                        FROM student_request_regist_intern 
+                        where id = ${id};`;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]);
+            });
+        });
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+const saveRequestJobIntern = async (requestInfo, file) => {
+    try {
+        const result = new Promise((resolve, reject) => {
+            db.query(
+              'INSERT INTO intern_job (start_date, submit_status, sent_require_time, job_id, student_id, appreciation_file) VALUES (?, ?, ?, ?, ?, ?)',
+              [requestInfo.registDate, false, requestInfo.registDate, requestInfo.jobId, requestInfo.studentId, file],
+              (err, result) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(result);
+                }
+              }
+            );
+          });
+        console.log(result);
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
 module.exports = {
     getSchool,
     getAllProgram,
@@ -830,4 +870,6 @@ module.exports = {
     confirmLearnIntern,
     getStudentRequestJobIntern,
     confirmInternJobRequested,
+    getInfoRequestOfstudent,
+    saveRequestJobIntern,
 }

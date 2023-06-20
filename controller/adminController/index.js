@@ -369,12 +369,15 @@ const handleConfirmInternJobRequested = async (req, res) => {
             throw new Error('No file uploaded');
         }
 
-        console.log(req);
         const file = req.file.buffer;
         const key = req.body.key;
         const result = await adminModel.confirmInternJobRequested(file, key);
-        console.log(result);
 
+        const requestInfo = await adminModel.getInfoRequestOfstudent(key);
+
+        if (result.affectedRows === 1) {
+            await adminModel.saveRequestJobIntern(requestInfo, file);
+        }
         return res.status(200).json('Xác nhận thành công');
     } catch (e) {
         console.log(e);
