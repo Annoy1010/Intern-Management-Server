@@ -1,4 +1,5 @@
 const adminModel = require("../../model/adminModel");
+const Joi = require('joi');
 
 const handleGetSchool = (req, res) => {
     const email = req.query.email;
@@ -305,6 +306,83 @@ const handleGetAllInternBoards = (req, res) => {
     adminModel.getAllInternBoards(req, res);
 }
 
+const handleConfirmLearnIntern = async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        const key = req.body.key;
+        if (!studentId) return res.status(400).json('Không tìm thấy sinh viên nào');
+        if (!key) return res.status(400).json('Lỗi không thể xác nhận đăng ký thực tập');
+
+        const result = await adminModel.confirmLearnIntern(studentId, key);
+        return res.status(200).json('Xác nhận thành công');
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ detail: e.message }); 
+    }
+}
+
+const handleGetStudentSignUpIntern = async (req, res) => {
+    try {        
+        const schema = Joi.object({
+            academic: Joi.number().default(0),
+            semester: Joi.number().default(0),
+            teacher: Joi.number().default(0),
+        });
+
+        const {error, value} = schema.validate(req.query);
+
+        if (error) return res.status(400).json(error);
+        console.log(req.query);
+
+        const result = await adminModel.getStudentSignUpIntern(value);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ detail: e.message });        
+    }
+}
+
+const handleGetStudentRequestJobIntern = async (req, res) => {
+    try {
+        const schema = Joi.object({
+            academic: Joi.number().default(0),
+            semester: Joi.number().default(0),
+        });
+
+        const {error, value} = schema.validate(req.query);
+
+        if (error) return res.status(400).json(error);
+
+        const result = await adminModel.getStudentRequestJobIntern(value);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.message});
+    }
+}
+
+const handleConfirmInternJobRequested = async (req, res) => {
+    try {
+        if (!req.file) {
+            throw new Error('No file uploaded');
+        }
+
+        console.log(req);
+        const file = req.file.buffer;
+        const key = req.body.key;
+        const result = await adminModel.confirmInternJobRequested(file, key);
+        console.log(result);
+
+        return res.status(200).json('Xác nhận thành công');
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.message});
+    }
+}
+
+
 module.exports = {
     handleGetSchool,
     handleGetProgram,
@@ -330,5 +408,9 @@ module.exports = {
     handlePostInternBoard,
     handlePutInternBoard,
     handleDeleteInternBoard,
-    handleGetAllInternBoards
+    handleGetAllInternBoards,
+    handleGetStudentSignUpIntern,
+    handleConfirmLearnIntern,
+    handleGetStudentRequestJobIntern,
+    handleConfirmInternJobRequested
 }

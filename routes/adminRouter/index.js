@@ -1,5 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.memoryStorage();
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        return cb(null, true);
+    }
+});
 
 const adminController = require('../../controller/adminController');
 
@@ -35,5 +46,10 @@ router.post('/intern/board/new', adminController.handlePostInternBoard);
 router.put('/intern/board/edit', adminController.handlePutInternBoard);
 router.delete('/intern/board/delete', adminController.handleDeleteInternBoard);
 router.get('/intern/board/all', adminController.handleGetAllInternBoards);
+
+router.get('/student/signup_intern', adminController.handleGetStudentSignUpIntern);
+router.put('/student/:id/confirm_learn_intern', adminController.handleConfirmLearnIntern);
+router.get('/student/request_job', adminController.handleGetStudentRequestJobIntern);
+router.put('/student/request_job/:id', upload.single('file'), adminController.handleConfirmInternJobRequested);
 
 module.exports = router;

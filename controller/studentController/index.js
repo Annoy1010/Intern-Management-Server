@@ -103,6 +103,11 @@ const deleteRegistInternJobRequestController = (req, res) => {
     studentModel.deleteRegistInternJobRequest(request_id, res);
 }
 
+const getAllRequestJobIntern = (req, res) => {
+    const student_id = req.query.student_id;
+    studentModel.getAllRequestJobIntern(student_id, res);
+}
+
 const getAllJobsController = (req, res) => {
     studentModel.getAllJobs(req, res);
 }
@@ -162,6 +167,7 @@ module.exports = {
     postRegistInternJobRequestController,
     getAllRegistInternJobRequestController,
     deleteRegistInternJobRequestController,
+    getAllRequestJobIntern,
     getAllJobsController,
     getJobInLibraryOfStudentController,
     postJobToLibraryController,
