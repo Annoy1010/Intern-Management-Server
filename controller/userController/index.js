@@ -1,6 +1,132 @@
 const Joi = require('joi');
 const userModel = require("../../model/userModel");
 
+const getUserInfo = async (req, res) => {
+    try {
+        console.log(req.headers.authorization);
+        const userId = await userModel.getUserId(req.headers.authorization);
+        console.log(userId);
+
+        if (!userId) return res.status(403).json('Vui lòng đăng nhập!');
+
+        const user = await userModel.getAdmin(userId);
+        console.log(user);
+    
+        return res.status(200).json(user);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ detail: e.message });  
+    }
+}
+
+const updateUser = async (req, res) => {
+    try {
+        console.log(req.headers.authorization);
+        const userId = await userModel.getUserId(req.headers.authorization);
+        console.log(userId);
+
+        if (!userId) return res.status(403).json('Vui lòng đăng nhập!');
+        const user = req.body.user;
+        console.log(user);
+
+        const result = await userModel.updateUser(user, userId);
+        console.log(result);
+
+        const _user = await userModel.getAdmin(userId);
+        console.log(_user);
+    
+        return res.status(200).json(user);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ detail: e.message });  
+    }
+}
+
+const getStudent = async (req, res) => {
+    try {
+        console.log(req.headers.authorization);
+        const userId = await userModel.getUserId(req.headers.authorization);
+        console.log(userId);
+
+        if (!userId) return res.status(403).json('Vui lòng đăng nhập!');
+
+        const user = await userModel.getStudent(userId);
+        console.log(user);
+    
+        return res.status(200).json(user);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ detail: e.message }); 
+    }
+}
+
+const updateStudent = async (req, res) => {
+    try {
+        console.log(req.headers.authorization);
+        const userId = await userModel.getUserId(req.headers.authorization);
+        console.log(userId);
+
+        if (!userId) return res.status(403).json('Vui lòng đăng nhập!');
+
+        const user = req.body.user;
+        console.log(user);
+        const result = await userModel.updateUser(user, userId);
+        await userModel.updateStudent(user);
+        console.log(result);
+    
+        const _user = await userModel.getStudent(userId);
+        console.log(_user);
+    
+        return res.status(200).json(_user);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ detail: e.message }); 
+    }
+}
+
+const getTeacher = async (req, res) => {
+    try {
+        console.log(req.headers.authorization);
+        const userId = await userModel.getUserId(req.headers.authorization);
+        console.log(userId);
+
+        if (!userId) return res.status(403).json('Vui lòng đăng nhập!');
+
+        const user = await userModel.getTeacher(userId);
+        console.log(user);
+    
+        return res.status(200).json(user);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ detail: e.message }); 
+
+    }
+}
+
+const updateTeacher = async (req, res) => {
+    try {
+        console.log(req.headers.authorization);
+        const userId = await userModel.getUserId(req.headers.authorization);
+        console.log(userId);
+
+        if (!userId) return res.status(403).json('Vui lòng đăng nhập!');
+
+        const user = req.body.user;
+        console.log(user);
+        const result = await userModel.updateUser(user, userId);
+        console.log(result);
+
+        await userModel.updateTeacher(user);
+    
+        const _user = await userModel.getTeacher(userId);
+        console.log(_user);
+    
+        return res.status(200).json(_user);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ detail: e.message }); 
+    }
+}
 const handleLoginInput = (req, res) => {
     const { username, pass } = req.body;
     if (username === '' || pass === '') {
@@ -143,5 +269,11 @@ module.exports = {
     verifyEmail,
     saveBusiness,
     getBusinessController,
-    putBusinessController
+    putBusinessController,
+    getUserInfo,
+    updateUser,
+    getStudent,
+    updateStudent,
+    getTeacher,
+    updateTeacher,
 }

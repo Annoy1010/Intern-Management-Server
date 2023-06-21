@@ -9,6 +9,129 @@ function hashPass(pass) {
     return hash.update(pass).digest('hex');
 }
 
+const getUserId = async (token) => {
+    try {
+        const query = `SELECT up.id FROM user_account ua, user_person up
+                        WHERE ua.token = '${token}' and ua.username = up.username`;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]?.id);
+            });
+        });    
+    } catch (e) {
+        throw e;
+    }
+}
+
+const getAdmin = async (userId) => {
+    try {
+        const query = `
+            SELECT * FROM user_person WHERE id = ${userId}
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]);
+            });
+        });
+    } catch (e) {
+        throw e;
+    }
+}
+
+const updateUser = async (user, userId) => {
+    try {
+        const query = `
+            UPDATE user_person
+            SET username = '${user.username}', full_name = '${user.full_name}', image = '${user.image}', phone = '${user.phone}', email = '${user.email}', address = '${user.address}'
+            WHERE id = ${userId};
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+    } catch (e) {
+        throw e;
+    }
+}
+
+const updateStudent = async (user) => {
+    try {
+        const query = `
+            UPDATE student
+            SET dob = '${user.dob}', current_status = ${user.current_status?.data?.[0]}, sex = ${user.sex?.data?.[0]}
+            WHERE id = ${user.studentId};
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+    } catch (e) {
+        throw e;
+    }
+}
+
+const updateTeacher = async (user) => {
+    try {
+        const query = `
+            UPDATE teacher
+            SET dob = '${user.dob}', current_status = ${user.current_status?.data?.[0]}, start_date = '${user.start_date}'
+            WHERE id = ${user.teacherId};
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+    } catch (e) {
+        throw e;
+    }
+}
+
+const getStudent = async (userId) => {
+    try {
+        const query = `
+            SELECT cl.id as 'class_id', st.id as 'studentId', up.id as 'userId', dp.id as 'dp_id', up.*, st.*, cl.*, dp.* 
+            FROM user_person up, student st, class cl, department dp 
+            WHERE up.id = st.user_id and cl.id = st.class_id 
+                and cl.department_id = dp.id and up.id = ${userId};
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]);
+            });
+        });
+    } catch (e) {
+        throw e;
+    }
+}
+
+const getTeacher = async (userId) => {
+    try {
+        const query = `
+            SELECT up.id as 'userId', tc.id as 'teacherId', dp.id as 'departmentId', up.*, tc.*, dp.*
+            FROM user_person up, teacher tc, department dp 
+            WHERE up.id = tc.user_id and tc.department_id = dp.id
+                and up.id = ${userId};
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]);
+            });
+        });
+    } catch (e) {
+        throw e;
+    }
+}
+
 const handleLoginDataModel = (data, res) => {
     const hashedPass = hashPass(data.pass);
     db.query(`SELECT pass FROM user_account WHERE username='${data.username}' and pass='${hashedPass}'`, (err, result) => {
@@ -287,4 +410,11 @@ module.exports = {
     getBusinessModel,
     putBusinessModel,
     getBusinessByBusinessId,
+    getUserId,
+    getAdmin,
+    updateUser,
+    getStudent,
+    getTeacher,
+    updateStudent,
+    updateTeacher,
 }
