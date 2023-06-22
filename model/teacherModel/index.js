@@ -166,6 +166,49 @@ const removeAppreciation = (id, res) => {
     })
 }
 
+const getStudentLearnInternByUserId = async (userId, academicId = 0, semesterId = 0) => {
+    try {
+        const query = `
+            SELECT upst.id as 'userIdstudent', st.id as 'studentId', cl.id as 'classId', dp.id as 'departmentId', 
+                isb.id as 'internSubId', sli.id as 'studentLearnInternId', upst.*, st.*, cl.*, dp.*, isb.*, sli.*
+            FROM user_person upst, student st, class cl, department dp, intern_subject isb, user_person uptc, teacher tc, student_learn_intern sli
+            WHERE upst.id = st.user_id and st.class_id = cl.id and cl.department_id = dp.id and st.id = sli.student_id
+                and sli.subject_id = isb.id and isb.teacher_id = tc.id and tc.user_id = uptc.id and uptc.id = ${userId} 
+                and (isb.academic_year = ${academicId} OR ${academicId} = 0) and (isb.semester_id = ${semesterId} OR ${semesterId} = 0);;
+        `;  
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+    } catch (e) {
+        throw e;
+    }
+}
+
+const saveScore = async (scores) => {
+    try {
+        const promises = scores.map(({ id, score }) => {
+            const query = `
+                UPDATE student_learn_intern
+                SET score = ?
+                WHERE id = ?
+            `;
+            return new Promise((resolve, reject) => {
+                db.query(query, [score, id], (err, result) => {
+                    if (err) reject(err);
+                    else resolve(result);
+                });
+            });
+          });
+          const results = await Promise.all(promises);
+          return results;
+    } catch (e) {
+        throw e;
+    }
+}
+
 module.exports = {
     getTeacher,
     getAssignedList,
@@ -174,5 +217,7 @@ module.exports = {
     removeTodo,
     postTodoAppreciation,
     getAllTodoAppreciation,
-    removeAppreciation
+    removeAppreciation,
+    getStudentLearnInternByUserId,
+    saveScore,
 }

@@ -1,4 +1,6 @@
 const teacherModel = require("../../model/teacherModel");
+const userModel = require("../../model/userModel");
+const Joi = require('joi');
 
 const getTeacherController = (req, res) => {
     teacherModel.getTeacher(req, res);
@@ -54,6 +56,53 @@ const removeAppreciationController = (req, res) => {
     teacherModel.removeAppreciation(id, res);
 }
 
+const getStudentLearnIntern = async (req, res) => {
+    try {
+        const userId = await userModel.getUserId(req.headers.authorization);
+        if (!userId) return res.status(403).json('Vui lòng đăng nhập trước');
+
+        const schema = Joi.object({
+            academic: Joi.number().default(0),
+            semester: Joi.number().default(0),
+        });
+
+        const {error, value} = schema.validate(req.query);
+
+        if (error) return res.status(401).json(error);
+
+        const result = await teacherModel.getStudentLearnInternByUserId(userId, value.academic, value.semester);
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.message});
+    }
+}
+
+const saveScore = async (req, res) => {
+    try {
+        const userId = await userModel.getUserId(req.headers.authorization);
+        if (!userId) return res.status(403).json('Vui lòng đăng nhập trước');
+
+        const schema = Joi.array().items(
+            Joi.object({
+                score: Joi.number().integer().max(10).min(0),
+                studentId: Joi.number().integer(),
+                id: Joi.number().integer(),
+            }),
+        ).required();
+
+        const {error, value} = schema.validate(req.body);
+        if (error) return res.status(403).json(error);
+
+        await teacherModel.saveScore(value);
+        const data = await teacherModel.getStudentLearnInternByUserId(userId);
+        return res.status(200).json(data);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.message});
+    }
+}
+
 module.exports = {
     getTeacherController,
     getAssignedListController,
@@ -62,5 +111,7 @@ module.exports = {
     removeTodoController,
     postTodoAppreciationController,
     getAllTodoAppreciationController,
-    removeAppreciationController
+    removeAppreciationController,
+    getStudentLearnIntern,
+    saveScore,
 }
