@@ -48,7 +48,7 @@ router.put('/subject/edit', adminController.handlePutSubject);
 
 router.get('/student/signup_intern', adminController.getStudentSignUpIntern);
 router.get('/student/request_job', adminController.getStudentRequestJobIntern);
-router.put('/student/request_job/:id', upload.single('file'), adminController.confirmInternJobRequested);
+router.put('/student/request_job/:id', adminController.confirmInternJobRequested);
 router.put('/student/:id/confirm_learn_intern', adminController.confirmLearnIntern);
 
 module.exports = router;

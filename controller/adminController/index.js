@@ -308,12 +308,12 @@ const getStudentRequestJobIntern = async (req, res) => {
 
 const confirmInternJobRequested = async (req, res) => {
     try {
-        if (!req.file) {
+        if (!req.body?.docx) {
             throw new Error('No file uploaded');
         }
         
         console.log(req);
-        const file = req.file.buffer;
+        const file = req.body.docx;
         const key = req.body.key;
         const result = await adminModel.confirmInternJobRequested(file, key);
         console.log(result);

@@ -171,7 +171,7 @@ const getAllInternOfBusiness = async (businessId) => {
     try {
         return new Promise((resolve, reject) => {
             db.query(`
-            SELECT sc.school_name , up.phone, up.email, ij.sent_require_time, up.address, up.full_name, j.job_name, ij.start_date 
+            SELECT sc.school_name , up.phone, up.email, ij.sent_require_time, up.address, up.full_name, j.job_name, ij.start_date, ij.id as 'key', st.id as 'studentId', ij.appreciation_file
             FROM intern_job ij, job j, student st, user_person up, class cl, department dp, school sc
             WHERE ij.job_id = j.id and j.business_id = ${businessId} 
                 and ij.student_id = st.id and st.user_id = up.id 
@@ -191,6 +191,24 @@ const getAllInternOfBusiness = async (businessId) => {
     }
 }
 
+const updateIntern = async ({start_date, appreciation_file, key}) => {
+    try {
+        const query = `
+            UPDATE intern_job
+            SET start_date = '${start_date}', appreciation_file = '${appreciation_file}'
+            WHERE id = ${key};
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+    } catch (e) {
+        throw e;
+    }
+}
+
 module.exports = {
     getBusinessInfo,
     getAllJobs,
@@ -201,4 +219,5 @@ module.exports = {
     getAllrequest,
     aceptRequest,
     getAllInternOfBusiness,
+    updateIntern,
 }
