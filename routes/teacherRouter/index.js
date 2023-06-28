@@ -11,5 +11,8 @@ router.delete('/todo/remove', teacherController.removeTodoController);
 router.post('/todo/appreciation/new', teacherController.postTodoAppreciationController);
 router.get('/todo/appreciation/all', teacherController.getAllTodoAppreciationController);
 router.delete('/todo/appreciation/remove', teacherController.removeAppreciationController);
+router.get('/student', teacherController.getStudentLearnIntern);
+router.put('/save_score', teacherController.saveScore);
+router.put('/save_score/:id', teacherController.saveScore);
 
 module.exports = router;
