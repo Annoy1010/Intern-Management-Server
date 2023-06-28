@@ -103,6 +103,43 @@ const getAllInternOfBusiness = async (req, res) => {
     return res.status(200).json(result);
 }
 
+const updateIntern = async (req, res) => {
+    try {
+        const businessId = businessModel.getBusinessId(req.headers.authorization);
+        if (!businessId) return res.status(403).json('Vui lòng đăng nhập!');
+
+        const schema = JOI.object({
+            start_date: JOI.date()
+                .required()
+                .iso()
+                .custom((value, helpers) => {
+                    const date = new Date(value);
+                    if (isNaN(date.getTime())) {
+                        return helpers.error('date.invalid');
+                    }
+                    const formattedDate = date.toISOString().slice(0, 10);
+                    return formattedDate;
+                }),
+            appreciation_file: JOI.required(),
+            key: JOI.number().integer().required(),
+        });
+
+        const {error, value} = schema.validate(req.body);
+
+        console.log("date start: ", value.start_date);
+
+        if (error) return res.status(401).json(error);
+
+        await businessModel.updateIntern(value);
+
+        return res.status(200).json();
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.message});
+    }
+}
+
 module.exports = {
     handleGetAllJobs,
     handleGetBusinessInfo,
@@ -112,4 +149,5 @@ module.exports = {
     getAllrequest,
     aceptRequest,
     getAllInternOfBusiness,
+    updateIntern,
 }

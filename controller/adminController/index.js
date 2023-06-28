@@ -365,11 +365,11 @@ const handleGetStudentRequestJobIntern = async (req, res) => {
 
 const handleConfirmInternJobRequested = async (req, res) => {
     try {
-        if (!req.file) {
+        if (!req.body?.docx) {
             throw new Error('No file uploaded');
         }
 
-        const file = req.file.buffer;
+        const file = req.body.docx;
         const key = req.body.key;
         const result = await adminModel.confirmInternJobRequested(file, key);
 

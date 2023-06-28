@@ -50,6 +50,6 @@ router.get('/intern/board/all', adminController.handleGetAllInternBoards);
 router.get('/student/signup_intern', adminController.handleGetStudentSignUpIntern);
 router.put('/student/:id/confirm_learn_intern', adminController.handleConfirmLearnIntern);
 router.get('/student/request_job', adminController.handleGetStudentRequestJobIntern);
-router.put('/student/request_job/:id', upload.single('file'), adminController.handleConfirmInternJobRequested);
+router.put('/student/request_job/:id', adminController.handleConfirmInternJobRequested);
 
 module.exports = router;
