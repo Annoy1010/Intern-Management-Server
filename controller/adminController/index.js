@@ -60,13 +60,14 @@ const handleGetSemester = (req, res) => {
 
 const handleGetDepartment = (req, res) => {
     const schoolId = req.query.schoolId;
+    const search = req.query.search || '';
     if (!schoolId) {
         res.send({ 
             statusCode: 400,
             responseData: 'Cần cung cấp mã trường'
         })
     } else {
-        adminModel.getAllDepartment(schoolId, res)
+        adminModel.getAllDepartment(schoolId, res, search)
     }
 }
 
@@ -129,7 +130,8 @@ const handlePutDepartment = (req, res) => {
 }
 
 const handleGetTeacher = (req, res) => {
-    adminModel.getAllTeacher(req, res)
+    const search = req.query.search || '';
+    adminModel.getAllTeacher(req, res, search)
 }
 
 const handlePostTeacherAccount = (req, res) => {

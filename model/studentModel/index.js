@@ -24,8 +24,8 @@ const getStudentId = async (token) => {
     }
 }
 
-const getALLStudents = (req, res) => {
-    db.query(`SELECT s.user_id, s.id as student_id, ps.image, ps.full_name, s.dob, ps.email, ps.address, s.class_id, c.class_name, s.major_id, d.id, s.current_status FROM student s, user_person ps, class c, department d WHERE s.user_id = ps.id and c.department_id = d.id and s.class_id = c.id`, (err, result) => {
+const getALLStudents = (req, res, search) => {
+    db.query(`SELECT s.user_id, s.id as student_id, ps.image, ps.full_name, s.dob, ps.email, ps.address, s.class_id, c.class_name, s.major_id, d.id, s.current_status FROM student s, user_person ps, class c, department d WHERE s.user_id = ps.id and c.department_id = d.id and s.class_id = c.id and ps.full_name LIKE '%${search}%'`, (err, result) => {
         if(err){
             console.log(err);
         }else{

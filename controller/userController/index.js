@@ -244,7 +244,8 @@ const saveBusiness = async (req, res) => {
 }
 
 const getBusinessController = (req, res) => {
-    userModel.getBusinessModel(req, res);
+    const nameBusiness = req.query.nameBusiness || '';
+    userModel.getBusinessModel(req, res, nameBusiness);
 }
 
 const putBusinessController = (req, res) => {

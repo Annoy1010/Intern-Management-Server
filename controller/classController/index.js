@@ -13,7 +13,8 @@ const addClassController = (req, res) => {
 }
 
 const getClassAllController = (req, res) => {
-    classModel.getClassAllModel(req, res);
+    const search = req.query.search || '';
+    classModel.getClassAllModel(req, res, search);
 }
 
 const getClassYearController = (req, res) => {

@@ -239,13 +239,13 @@ const verifyEmailModel = (email, res) => {
     })
 }
 
-const getBusinessModel = (req, res) => {
-    db.query(`SELECT bs.id, ac.username, ps.image, ps.phone, ps.email, ps.address, DATE_FORMAT(bs.establish_date, '%Y-%m-%d') as establish_date, bs.industry_sector, ps.full_name as company_name, bs.short_desc, bs.representator FROM business bs, user_account ac, user_person ps WHERE ac.username = ps.username and ps.id = bs.user_id`, (err, result) => {
+const getBusinessModel = (req, res, nameBusiness) => {
+    db.query(`SELECT bs.id, ac.username, ps.image, ps.phone, ps.email, ps.address, DATE_FORMAT(bs.establish_date, '%Y-%m-%d') as establish_date, bs.industry_sector, ps.full_name as company_name, bs.short_desc, bs.representator FROM business bs, user_account ac, user_person ps WHERE ac.username = ps.username and ps.id = bs.user_id and (ps.full_name LIKE '%${nameBusiness}%')`, (err, result) => {
         if(err){
             console.log(err);
         }else{
             res.send(result);
-            console.log(result);
+            console.log(nameBusiness);
         }
     })
 }

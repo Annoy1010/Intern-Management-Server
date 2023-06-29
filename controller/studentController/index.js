@@ -2,7 +2,8 @@ const studentModel = require("../../model/studentModel");
 const Joi = require('joi');
 
 const getAllStudentsController = (req, res) => {
-    studentModel.getALLStudents(req, res);
+    const search = req.query.search || '';
+    studentModel.getALLStudents(req, res, search);
 }
 
 const getStudentIdByUserIdController = (req, res) => {

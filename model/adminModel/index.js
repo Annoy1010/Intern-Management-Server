@@ -120,8 +120,8 @@ const getSemester = (req, res) => {
     })
 }
 
-const getAllDepartment = (schoolId, res) => {
-    db.query(`SELECT * FROM department WHERE school_id = ${schoolId}`, (err, result) => {
+const getAllDepartment = (schoolId, res, search) => {
+    db.query(`SELECT * FROM department WHERE school_id = ${schoolId} and department_name LIKE '%${search}%'`, (err, result) => {
         if (err) {
             res.send({ 
                 statusCode: 400,
@@ -293,8 +293,8 @@ const editDepartment = (req, res) => {
     })
 }
 
-const getAllTeacher = (req, res) => {
-    db.query("SELECT * FROM teacher t, user_person up WHERE t.user_id = up.id", (err, result) => {
+const getAllTeacher = (req, res, search) => {
+    db.query(`SELECT * FROM teacher t, user_person up WHERE t.user_id = up.id and up.full_name LIKE '%${search}%'`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,
