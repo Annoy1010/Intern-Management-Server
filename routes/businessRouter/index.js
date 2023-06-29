@@ -12,5 +12,7 @@ router.get('/job/request', businessController.getAllrequest);
 router.post('/job/request/:job_id', businessController.aceptRequest);
 router.get('/interns', businessController.getAllInternOfBusiness);
 router.put('/interns/:id', businessController.updateIntern);
+router.get('/interns/student', businessController.getAllInterningStudent)
+router.get('/interns/submit/history', businessController.getSubmitHistory);
 
 module.exports = router;

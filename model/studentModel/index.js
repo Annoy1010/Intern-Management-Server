@@ -429,7 +429,7 @@ const postRegistInternJobRequest = (req, res) => {
 }
 
 const getAllRegistInternJobRequest = (student_id, res) => {
-    db.query(`SELECT sr.id, up.full_name as company_name, j.job_name, sr.regist_submit_status, sr.regist_date FROM student_request_regist_intern sr, job j, business b, user_person up WHERE sr.student_id=${student_id} AND sr.job_id=j.id AND j.business_id=b.id AND b.user_id=up.id`, (err, result) => {
+    db.query(`SELECT sr.id, up.username as company_name, j.job_name, sr.regist_submit_status, sr.regist_date FROM student_request_regist_intern sr, job j, business b, user_person up WHERE sr.student_id=${student_id} AND sr.job_id=j.id AND j.business_id=b.id AND b.user_id=up.id`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,

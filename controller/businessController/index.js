@@ -140,6 +140,23 @@ const updateIntern = async (req, res) => {
     }
 }
 
+const getAllInterningStudent = (req, res) => {
+    businessModel.getAllInterningStudent(req, res)
+}
+
+const getSubmitHistory = async (req, res) => {
+    try {
+        const businessId = await businessModel.getBusinessId(req.headers.authorization);
+        if ( !businessId ) return res.status(403).json('user was not found!');
+
+        const result = await businessModel.getSubmitHistory(businessId);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
 module.exports = {
     handleGetAllJobs,
     handleGetBusinessInfo,
@@ -150,4 +167,6 @@ module.exports = {
     aceptRequest,
     getAllInternOfBusiness,
     updateIntern,
+    getAllInterningStudent,
+    getSubmitHistory
 }

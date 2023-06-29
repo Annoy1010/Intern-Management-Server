@@ -126,11 +126,12 @@ const getAllrequest = async (businessId) => {
     try {
         return new Promise((resolve, reject) => {
             db.query(`
-                select st.id, up.image, up.full_name, j.job_name, ij.job_id, ij.id AS keyInternJob 
-                from intern_job ij, job j, student st, user_person up 
+                select st.id, up.image, up.full_name, j.job_name, ij.job_id, ij.id AS keyInternJob, sc.school_name 
+                from intern_job ij, job j, student st, user_person up, program p, school sc 
                 where ij.job_id = j.id and j.business_id = ${businessId} 
                     and ij.student_id = st.id and st.user_id = up.id
-                    and ij.submit_status = 0;
+                    and ij.submit_status = 0
+                    and st.program_id = p.id and p.school_id = sc.id;
             `, (err, result) => {
                 if (err) {
                     reject(err);
@@ -151,7 +152,7 @@ const aceptRequest = async (jobId, studentId, keyInternJob) => {
         return new Promise((resolve, reject) => {
             db.query(`
                 UPDATE intern_job ij 
-                SET ij.submit_status = TRUE 
+                SET ij.submit_status = TRUE, ij.is_interning = TRUE 
                 WHERE ij.job_id = ${jobId} and ij.student_id = ${studentId} 
                     and ij.id = ${keyInternJob};
             `, (err, result) => {
@@ -210,6 +211,53 @@ const updateIntern = async ({start_date, appreciation_file, key}) => {
     }
 }
 
+const getAllInterningStudent = (req, res) => {
+    db.query(
+        `
+            SELECT up.image, up.full_name, j.job_name, ij.start_date, ij.is_interning, up.email, up.address, sc.school_name, up.phone
+            FROM intern_job ij, student st, job j, user_person up, program p, school sc 
+            WHERE ij.student_id = st.id AND ij.job_id = j.id AND st.user_id = up.id 
+                AND ij.is_interning = 1 AND ij.submit_status = 1
+                AND st.program_id = p.id and p.school_id = sc.id
+        `, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err.toString()
+                })
+            } else {
+                res.send({
+                    statusCode: 200, 
+                    responseData: result
+                })
+            }
+        })
+}
+
+const getSubmitHistory = async (businessId) => {
+    try {
+        return new Promise((resolve, reject) => {
+            db.query(`
+                select st.id, up.image, up.full_name, j.job_name, ij.job_id, ij.id AS keyInternJob, sc.school_name, ij.start_date AS submit_date
+                from intern_job ij, job j, student st, user_person up, program p, school sc 
+                where ij.job_id = j.id and j.business_id = ${businessId} 
+                    and ij.student_id = st.id and st.user_id = up.id
+                    and st.program_id = p.id and p.school_id = sc.id
+                    and ij.submit_status = 1 and ij.is_interning = 1;
+            `, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        })
+    } catch (error) {
+        console.log(error);
+        throw error;
+    } 
+}
+
 module.exports = {
     getBusinessInfo,
     getAllJobs,
@@ -221,4 +269,6 @@ module.exports = {
     aceptRequest,
     getAllInternOfBusiness,
     updateIntern,
+    getAllInterningStudent,
+    getSubmitHistory
 }
