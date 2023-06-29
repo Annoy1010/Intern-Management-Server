@@ -121,7 +121,7 @@ const getSkillsOfJob = (job_id, res) => {
     })
 }
 
-const getAllrequest = async (businessId) => {
+const getAllrequest = async (businessId, searchRequest) => {
     try {
         return new Promise((resolve, reject) => {
             db.query(`
@@ -129,7 +129,7 @@ const getAllrequest = async (businessId) => {
                 from intern_job ij, job j, student st, user_person up 
                 where ij.job_id = j.id and j.business_id = ${businessId} 
                     and ij.student_id = st.id and st.user_id = up.id
-                    and ij.submit_status = 0;
+                    and ij.submit_status = 0 and up.full_name LIKE '%${searchRequest}%';
             `, (err, result) => {
                 if (err) {
                     reject(err);
@@ -167,7 +167,7 @@ const aceptRequest = async (jobId, studentId, keyInternJob) => {
     }
 }
 
-const getAllInternOfBusiness = async (businessId) => {
+const getAllInternOfBusiness = async (businessId, searchIntern) => {
     try {
         return new Promise((resolve, reject) => {
             db.query(`
@@ -176,7 +176,7 @@ const getAllInternOfBusiness = async (businessId) => {
             WHERE ij.job_id = j.id and j.business_id = ${businessId} 
                 and ij.student_id = st.id and st.user_id = up.id 
                 and ij.submit_status = ${1} and st.class_id = cl.id 
-                and cl.department_id = dp.id and dp.school_id = sc.id;
+                and cl.department_id = dp.id and dp.school_id = sc.id and up.full_name LIKE '%${searchIntern}%';
             `, (err, result) => {
                 if (err) {
                     reject(err);
