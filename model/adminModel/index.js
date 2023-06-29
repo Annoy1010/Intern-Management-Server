@@ -717,7 +717,7 @@ const getAllInternBoards = (req, res) => {
 
 const confirmLearnIntern = async (studentId, key) => {
     try {
-        const query = `UPDATE student_learn_intern SET regist_status = 1 WHERE student_id = ${studentId} and id = ${key}`;
+        const query = `UPDATE student_learn_intern SET regist_status = 1, is_learning = 1 WHERE student_id = ${studentId} and id = ${key}`;
         return new Promise((resolve, reject) => {
             db.query(query, (err, result) => {
                 if (err) reject(err);

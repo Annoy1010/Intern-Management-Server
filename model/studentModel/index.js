@@ -403,8 +403,29 @@ const postRegistInternJobRequest = (req, res) => {
             }
         })
     }
+
+    const checkRegistedLearnInternSubject = () => {
+        db.query(`SELECT * FROM student_learn_intern WHERE student_id=${student_id} AND regist_status=1 AND is_learning=1`, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err.toString()
+                })
+            } else {
+                if (result.length === 0) {
+                    res.send({
+                        statusCode: 400,
+                        responseData: 'Bạn không thể gửi yêu cầu công việc thực tập khi chưa đăng kí môn học'
+                    })
+                } else {
+                    handlePostRequest();
+                }
+            }
+        })
+    }
+
+    checkRegistedLearnInternSubject();
     
-    handlePostRequest();
 }
 
 const getAllRegistInternJobRequest = (student_id, res) => {
