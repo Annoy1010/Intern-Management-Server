@@ -271,9 +271,11 @@ const getStudentSignUpIntern = async (req, res) => {
             academic: Joi.number().default(0),
             semester: Joi.number().default(0),
             teacher: Joi.number().default(0),
+            searchStudentIntern: Joi.string().default(''),
         });
     
         const {error, value} = schema.validate(req.query);
+        console.log(value);
     
         if (error) return res.status(400).json(error);
     
@@ -291,6 +293,7 @@ const getStudentRequestJobIntern = async (req, res) => {
         const schema = Joi.object({
             academic: Joi.number().default(0),
             semester: Joi.number().default(0),
+            search: Joi.string().default(''),
         });
     
         const {error, value} = schema.validate(req.query);
