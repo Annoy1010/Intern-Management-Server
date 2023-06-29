@@ -1,4 +1,5 @@
 const studentModel = require("../../model/studentModel");
+const Joi = require('joi');
 
 const getAllStudentsController = (req, res) => {
     studentModel.getALLStudents(req, res);
@@ -151,6 +152,32 @@ const updateTodoOfStudentController = (req, res) => {
     studentModel.updateTodoOfStudent(id, end_date, res);
 }
 
+const saveReport = async (req, res) => {
+    try {
+        const studentId = await studentModel.getStudentId(req.headers.authorization);
+
+        const schema = Joi.object({
+            result_file: Joi.string().required(),
+            result_business_file:  Joi.string().required(),
+            result_teacher_file: Joi.string().required(),
+            sent_time: Joi.date().default(new Date().toISOString().slice(0, 10)),
+        });
+
+        const {error, value} = schema.validate(req.body);
+
+        if (error) return res.status(401).json(error);
+
+        const result = await studentModel.deleteReport(studentId);
+        console.log(result);
+
+        await studentModel.saveReport(value, studentId);
+        return res.status(200).json();
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.mesaage});
+    }
+}
+
 module.exports = {
     getAllStudentsController,
     getStudentIdByUserIdController,
@@ -176,4 +203,5 @@ module.exports = {
     getAllTodoOfStudentController,
     updateTodoOfStudentController,
     getAllRequestJobIntern,
+    saveReport,
 }

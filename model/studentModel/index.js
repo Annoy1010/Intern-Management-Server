@@ -9,6 +9,21 @@ function hashPass(pass) {
     return hash.update(pass).digest('hex');
 }
 
+const getStudentId = async (token) => {
+    try {
+        const query = `SELECT st.id FROM user_account ua, user_person up, student st
+                        WHERE ua.token = '${token}' and ua.username = up.username and up.id = st.user_id`;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]?.id);
+            });
+        });    
+    } catch (e) {
+        throw e;
+    }
+}
+
 const getALLStudents = (req, res) => {
     db.query(`SELECT s.user_id, s.id as student_id, ps.image, ps.full_name, s.dob, ps.email, ps.address, s.class_id, c.class_name, s.major_id, d.id, s.current_status FROM student s, user_person ps, class c, department d WHERE s.user_id = ps.id and c.department_id = d.id and s.class_id = c.id`, (err, result) => {
         if(err){
@@ -570,7 +585,7 @@ const getAllTodoOfStudent = (student_id, res) => {
                 responseData: err,
             })
         } else {
-            const regular_id = result[0].id;
+            const regular_id = result[0]?.id;
             getAllTodos(regular_id);
         }
     })
@@ -592,6 +607,39 @@ const updateTodoOfStudent = (id, end_date, res) => {
             }
         }
     })
+}
+
+const saveReport = async ({result_file, result_business_file, result_teacher_file, sent_time}, studentId) => {
+    try {
+        const query = `
+            INSERT INTO  report (report_file, result_business_file, result_teacher_file, sent_time, student_id)
+            VALUES ('${result_file}', '${result_business_file}', '${result_teacher_file}', '${sent_time}', ${studentId})
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]?.id);
+            });
+        }); 
+    } catch (e) {
+        throw e;
+    }
+}
+
+const deleteReport = async (studentId) => {
+    try {
+        const query = `
+            DELETE FROM report WHERE student_id = ${studentId}
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]?.id);
+            });
+        }); 
+    } catch (e) {
+        throw e;
+    }
 }
 
 module.exports = {
@@ -619,4 +667,7 @@ module.exports = {
     getAllTodoOfStudent,
     updateTodoOfStudent,
     getAllRequestJobIntern,
+    getStudentId,
+    saveReport,
+    deleteReport,
 }
