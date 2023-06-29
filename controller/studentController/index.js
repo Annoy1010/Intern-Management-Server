@@ -111,7 +111,8 @@ const deleteRegistInternJobRequestController = (req, res) => {
 }
 
 const getAllJobsController = (req, res) => {
-    studentModel.getAllJobs(req, res);
+    const searchJob = req.query.searchJob || '';
+    studentModel.getAllJobs(req, res, searchJob);
 }
 
 const getJobInLibraryOfStudentController = (req, res) => {
@@ -128,7 +129,8 @@ const postJobToLibraryController = (req, res) => {
 
 const getAllJobsInLibraryController = (req, res) => {
     const student_id = req.query.student_id;
-    studentModel.getAllJobsInLibrary(student_id, res);
+    const search = req.query.search || '';
+    studentModel.getAllJobsInLibrary(student_id, res, search);
 }
 
 const deleteJobFromLibraryController = (req, res) => {

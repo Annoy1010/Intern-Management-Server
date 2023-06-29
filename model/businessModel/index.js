@@ -31,7 +31,7 @@ const getBusinessId = async (token) => {
           });
         });
         console.log(result);
-        return result[0].id;
+        return result[0]?.id;
       } catch (error) {
         console.log(error);
         return 0;
