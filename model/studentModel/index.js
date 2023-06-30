@@ -642,6 +642,22 @@ const deleteReport = async (studentId) => {
     }
 }
 
+const getFileAppreciateBusiness = async (studentId) => {
+    try {
+        const query = `
+            SELECT appreciation_file FROM intern_job WHERE student_id = ${studentId}
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]?.appreciation_file);
+            });
+        }); 
+    } catch (e) {
+        throw e;
+    }
+}
+
 module.exports = {
     getALLStudents,
     getStudentIdByUserId,
@@ -670,4 +686,5 @@ module.exports = {
     getStudentId,
     saveReport,
     deleteReport,
+    getFileAppreciateBusiness,
 }

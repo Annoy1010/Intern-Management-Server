@@ -181,6 +181,20 @@ const saveReport = async (req, res) => {
     }
 }
 
+const getFileAppreciateBusiness = async (req, res) => {
+    try {
+        const studentId = await studentModel.getStudentId(req.headers.authorization);
+        if (!studentId) return res.status(401).json('user was not found');
+
+        const result = await studentModel.getFileAppreciateBusiness(studentId);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.mesaage});
+    }
+}
+
 module.exports = {
     getAllStudentsController,
     getStudentIdByUserIdController,
@@ -207,4 +221,5 @@ module.exports = {
     updateTodoOfStudentController,
     getAllRequestJobIntern,
     saveReport,
+    getFileAppreciateBusiness,
 }
