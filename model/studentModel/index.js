@@ -9,8 +9,8 @@ function hashPass(pass) {
     return hash.update(pass).digest('hex');
 }
 
-const getALLStudents = (req, res) => {
-    db.query(`SELECT s.user_id, s.id as student_id, ps.image, ps.full_name, s.dob, ps.email, ps.address, s.class_id, c.class_name, s.major_id, d.id as department_id, s.current_status FROM student s, user_person ps, class c, department d WHERE s.user_id = ps.id and c.department_id = d.id and s.class_id = c.id`, (err, result) => {
+const getALLStudents = (req, res, search) => {
+    db.query(`SELECT s.user_id, s.id as student_id, ps.image, ps.full_name, s.dob, ps.email, ps.address, s.class_id, c.class_name, s.major_id, d.id as department_id, s.current_status FROM student s, user_person ps, class c, department d WHERE s.user_id = ps.id and c.department_id = d.id and s.class_id = c.id and ps.full_name LIKE '%${search}%'`, (err, result) => {
         if(err){
             console.log(err);
         }else{
@@ -486,8 +486,8 @@ const getAllRequestJobIntern = (student_id, res) => {
     })
 }
 
-const getAllJobs = (req, res) => {
-    db.query(`SELECT * FROM job WHERE vacancies > 0`, (err, result) => {
+const getAllJobs = (req, res, searchJob) => {
+    db.query(`SELECT * FROM job WHERE vacancies > 0 and (job_name LIKE '%${searchJob}%')`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,
@@ -537,8 +537,8 @@ const postJobToLibrary = (student_id, job_id, res) => {
     })
 }
 
-const getAllJobsInLibrary = (student_id, res) => {
-    db.query(`SELECT j.id, j.job_name, j.image, j.job_desc, j.requirements, j.another_information, j.business_id, j.vacancies FROM job j, job_favorite jf WHERE jf.student_id=${student_id} and j.id=jf.job_id`, (err, result) => {
+const getAllJobsInLibrary = (student_id, res, search) => {
+    db.query(`SELECT j.id, j.job_name, j.image, j.job_desc, j.requirements, j.another_information, j.business_id, j.vacancies FROM job j, job_favorite jf WHERE jf.student_id=${student_id} and j.id=jf.job_id and (j.job_name LIKE '%${search}%')`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,

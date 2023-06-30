@@ -121,8 +121,8 @@ const getSemester = (req, res) => {
     })
 }
 
-const getAllDepartment = (schoolId, res) => {
-    db.query(`SELECT * FROM department WHERE school_id = ${schoolId}`, (err, result) => {
+const getAllDepartment = (schoolId, res, search) => {
+    db.query(`SELECT * FROM department WHERE school_id = ${schoolId} and department_name LIKE '%${search}%'`, (err, result) => {
         if (err) {
             res.send({ 
                 statusCode: 400,
@@ -311,8 +311,8 @@ const editDepartment = (req, res) => {
     })
 }
 
-const getAllTeacher = (req, res) => {
-    db.query("SELECT t.id, t.dob, t.start_date, t.education_level, t.experience_year, t.current_status, t.user_id, t.department_id, up.full_name, up.image, up.phone, up.email, up.address, up.username  FROM teacher t, user_person up WHERE t.user_id = up.id", (err, result) => {
+const getAllTeacher = (req, res, search) => {
+    db.query("SELECT t.id, t.dob, t.start_date, t.education_level, t.experience_year, t.current_status, t.user_id, t.department_id, up.full_name, up.image, up.phone, up.email, up.address, up.username  FROM teacher t, user_person up WHERE t.user_id = up.id and up.full_name LIKE '%${search}%'", (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,
@@ -730,7 +730,7 @@ const confirmLearnIntern = async (studentId, key) => {
     }
 }
 
-const getStudentSignUpIntern = async ({academic, semester, teacher}) => {
+const getStudentSignUpIntern = async ({academic, semester, teacher, searchStudentIntern}) => {
     try {
             query= `SELECT st.id, upst.image as 'studentImage' , upst.full_name as 'studentName',
                         uptc.full_name as 'teacherName', cl.class_name as 'className',
@@ -741,7 +741,9 @@ const getStudentSignUpIntern = async ({academic, semester, teacher}) => {
                         and uptc.id = tc.user_id and st.class_id = cl.id
                         and tc.department_id = dp.id and sti.regist_status = 0
                         and (isub.teacher_id = tc.id) and (isub.academic_year = ${academic} OR ${academic} = 0 )
-                        and (isub.semester_id = ${semester} OR ${semester} = 0 ) and (tc.user_id = ${teacher} OR ${teacher} = 0);`;
+                        and (isub.semester_id = ${semester} OR ${semester} = 0 ) and (tc.user_id = ${teacher} OR ${teacher} = 0)
+                        and (upst.full_name LIKE '%${searchStudentIntern}%');
+                        `;
 
         return new Promise((resolve, reject) => {
             db.query(query, (err, result) => {
@@ -755,7 +757,7 @@ const getStudentSignUpIntern = async ({academic, semester, teacher}) => {
     }
 }
 
-const getStudentRequestJobIntern = async ({academic, semester}) => {
+const getStudentRequestJobIntern = async ({academic, semester, search}) => {
     try {
         const query = ` SELECT upst.image as 'studentImage', upst.full_name as 'studentName', j.job_name as 'position', st.id as 'studentId', srri.id as 'key',
                                uptc.image as 'teacherImage', uptc.full_name as 'teacherName', dp.department_name as 'departmentName', uptc.email as 'teacherEmail'
@@ -765,7 +767,9 @@ const getStudentRequestJobIntern = async ({academic, semester}) => {
                         WHERE srri.student_id = st.id and st.user_id = upst.id
                             and srri.job_id = j.id and st.id = sli.student_id
                             and sli.subject_id = isub.id and isub.teacher_id = tc.id 
-                            and tc.user_id = uptc.id and tc.department_id = dp.id and srri.regist_submit_status = 2;`;
+                            and tc.user_id = uptc.id and tc.department_id = dp.id and srri.regist_submit_status = 2
+                            and (isub.academic_year = ${academic} OR ${academic} = 0 ) and (isub.semester_id = ${semester} OR ${semester} = 0)
+                            and (upst.full_name LIKE '%${search}%');`;
         return new Promise((resolve, reject) => {
             db.query(query, (err, result) => {
                 if (err) reject(err);

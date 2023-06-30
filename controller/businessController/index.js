@@ -64,9 +64,10 @@ const handleGetSkillsOfJob = (req, res) => {
 const getAllrequest = async (req, res) => {
     try {
         const businessId = await businessModel.getBusinessId(req.headers.authorization);
+        const searchRequest = req.query.searchRequest || '';
         if ( !businessId ) return res.status(403).json('user was not found!');
 
-        const result = await businessModel.getAllrequest(businessId);
+        const result = await businessModel.getAllrequest(businessId, searchRequest);
         return res.status(200).json(result);
     } catch (error) {
         console.log(error);
@@ -95,11 +96,11 @@ const aceptRequest = async (req, res) => {
 }
 
 const getAllInternOfBusiness = async (req, res) => {
-    console.log(req.headers.authorization);
     const businessId = await businessModel.getBusinessId(req.headers.authorization);
+    const searchIntern = req.query.searchIntern || '';
     if ( !businessId ) return res.status(403).json('user was not found');
 
-    const result = await businessModel.getAllInternOfBusiness(businessId);
+    const result = await businessModel.getAllInternOfBusiness(businessId, searchIntern);
     return res.status(200).json(result);
 }
 
@@ -140,8 +141,13 @@ const updateIntern = async (req, res) => {
     }
 }
 
-const getAllInterningStudent = (req, res) => {
-    businessModel.getAllInterningStudent(req, res)
+const getAllInterningStudent = async (req, res) => {
+    const businessId = await businessModel.getBusinessId(req.headers.authorization);
+    const searchIntern = req.query.searchIntern || '';
+    if ( !businessId ) return res.status(403).json('user was not found');
+
+    const result = await businessModel.getAllInterningStudent(businessId, searchIntern);
+    return res.status(200).json(result);
 }
 
 const getSubmitHistory = async (req, res) => {

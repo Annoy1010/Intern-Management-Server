@@ -37,8 +37,8 @@ const addClassModel = (req, res) => {
     })
 }
 
-const getClassAllModel = (req, res) => {
-    db.query(`SELECT c.id, c.class_name, d.department_name, department_id, c.head_teacher, c.students FROM class c, department d WHERE c.department_id = d.id`, (err, result) => {
+const getClassAllModel = (req, res, search) => {
+    db.query(`SELECT c.id, c.class_name, d.department_name, department_id, c.head_teacher, c.students FROM class c, department d WHERE c.department_id = d.id and c.class_name LIKE '%${search}%'`, (err, result) => {
         if (err){
             console.log(err);
         }else{

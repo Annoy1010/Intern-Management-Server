@@ -64,13 +64,14 @@ const getStudentLearnIntern = async (req, res) => {
         const schema = Joi.object({
             academic: Joi.number().default(0),
             semester: Joi.number().default(0),
+            searchStudent: Joi.string().default(''),
         });
 
         const {error, value} = schema.validate(req.query);
 
         if (error) return res.status(401).json(error);
 
-        const result = await teacherModel.getStudentLearnInternByUserId(userId, value.academic, value.semester);
+        const result = await teacherModel.getStudentLearnInternByUserId(userId, value.academic, value.semester, value.searchStudent);
         return res.status(200).json(result);
     } catch (e) {
         console.log(e);

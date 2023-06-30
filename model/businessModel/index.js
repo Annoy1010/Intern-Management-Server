@@ -32,7 +32,7 @@ const getBusinessId = async (token) => {
           });
         });
         console.log(result);
-        return result[0].id;
+        return result[0]?.id;
       } catch (error) {
         console.log(error);
         return 0;
@@ -122,7 +122,7 @@ const getSkillsOfJob = (job_id, res) => {
     })
 }
 
-const getAllrequest = async (businessId) => {
+const getAllrequest = async (businessId, searchRequest) => {
     try {
         return new Promise((resolve, reject) => {
             db.query(`
@@ -131,7 +131,8 @@ const getAllrequest = async (businessId) => {
                 where ij.job_id = j.id and j.business_id = ${businessId} 
                     and ij.student_id = st.id and st.user_id = up.id
                     and ij.submit_status = 0
-                    and st.program_id = p.id and p.school_id = sc.id;
+                    and st.program_id = p.id and p.school_id = sc.id
+                    and up.full_name LIKE '%${searchRequest}%';
             `, (err, result) => {
                 if (err) {
                     reject(err);
@@ -177,7 +178,7 @@ const aceptRequest = async (jobId, studentId, keyInternJob) => {
     }
 }
 
-const getAllInternOfBusiness = async (businessId) => {
+const getAllInternOfBusiness = async (businessId, searchIntern) => {
     try {
         return new Promise((resolve, reject) => {
             db.query(`
@@ -186,7 +187,8 @@ const getAllInternOfBusiness = async (businessId) => {
             WHERE ij.job_id = j.id and j.business_id = ${businessId} 
                 and ij.student_id = st.id and st.user_id = up.id 
                 and ij.submit_status = ${1} and st.class_id = cl.id 
-                and cl.department_id = dp.id and dp.school_id = sc.id;
+                and cl.department_id = dp.id and dp.school_id = sc.id
+                and up.full_name LIKE '%${searchIntern}%';
             `, (err, result) => {
                 if (err) {
                     reject(err);
@@ -219,14 +221,32 @@ const updateIntern = async ({start_date, appreciation_file, key}) => {
     }
 }
 
-const getAllInterningStudent = (req, res) => {
-    db.query(
-        `
+const getAllInterningStudent = async (businessId, searchIntern) => {
+    try {
+        return new Promise((resolve, reject) => {
+            db.query(`
             SELECT up.image, up.full_name, j.job_name, ij.start_date, ij.is_interning, up.email, up.address, sc.school_name, up.phone
             FROM intern_job ij, student st, job j, user_person up, program p, school sc 
-            WHERE ij.student_id = st.id AND ij.job_id = j.id AND st.user_id = up.id 
+            WHERE ij.student_id = st.id AND j.business_id = ${businessId}
+                AND ij.job_id = j.id AND st.user_id = up.id 
                 AND ij.is_interning = 1 AND ij.submit_status = 1
                 AND st.program_id = p.id and p.school_id = sc.id
+                AND up.full_name LIKE '%${searchIntern}%';
+            `, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+    db.query(
+        `
+            
         `, (err, result) => {
             if (err) {
                 res.send({

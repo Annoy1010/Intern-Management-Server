@@ -11,7 +11,7 @@ const getUserId = async (token) => {
         return new Promise((resolve, reject) => {
             db.query(query, (err, result) => {
                 if (err) reject(err);
-                else resolve(result[0].id);
+                else resolve(result[0]?.id);
             });
         });    
     } catch (e) {
