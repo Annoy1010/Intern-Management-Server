@@ -577,7 +577,7 @@ const deleteJobFromLibrary = (student_id, job_id, res) => {
 }
 
 const getCareJob  = (student_id, res) => {
-    db.query(`SELECT jf.student_id, jf.job_id, j.job_name, up.full_name as company_name, b.industry_sector, j.job_desc FROM job_favorite jf, job j, business b, user_person up WHERE jf.student_id=${student_id} AND jf.job_id=j.id AND j.business_id=b.id AND b.user_id=up.id`, (err, result) => {
+    db.query(`SELECT jf.student_id, jf.job_id, j.job_name, up.username as company_name, b.industry_sector, j.job_desc FROM job_favorite jf, job j, business b, user_person up WHERE jf.student_id=${student_id} AND jf.job_id=j.id AND j.business_id=b.id AND b.user_id=up.id`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,

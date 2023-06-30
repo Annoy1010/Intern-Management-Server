@@ -817,7 +817,7 @@ const saveRequestJobIntern = async (requestInfo, file) => {
         const result = new Promise((resolve, reject) => {
             db.query(
               'INSERT INTO intern_job (start_date, submit_status, sent_require_time, job_id, student_id, appreciation_file, is_interning) VALUES (?, ?, ?, ?, ?, ?)',
-              [requestInfo.registDate, false, requestInfo.registDate, requestInfo.jobId, requestInfo.studentId, file, 0],
+              [requestInfo.registDate, false, requestInfo.registDate, requestInfo.jobId, requestInfo.studentId, '', 0],
               (err, result) => {
                 if (err) {
                   reject(err);

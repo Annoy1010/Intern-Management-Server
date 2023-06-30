@@ -159,7 +159,15 @@ const aceptRequest = async (jobId, studentId, keyInternJob) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(result);
+                    if (result.affectedRows > 0) {
+                        db.query(`UPDATE job SET vacancies -= 1 WHERE id = ${jobId}`, (err, result) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(result);
+                            }
+                        })
+                    }
                 }
             });
         });
