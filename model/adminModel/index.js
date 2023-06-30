@@ -312,7 +312,7 @@ const editDepartment = (req, res) => {
 }
 
 const getAllTeacher = (req, res, search) => {
-    db.query("SELECT t.id, t.dob, t.start_date, t.education_level, t.experience_year, t.current_status, t.user_id, t.department_id, up.full_name, up.image, up.phone, up.email, up.address, up.username  FROM teacher t, user_person up WHERE t.user_id = up.id and up.full_name LIKE '%${search}%'", (err, result) => {
+    db.query(`SELECT t.id, t.dob, t.start_date, t.education_level, t.experience_year, t.current_status, t.user_id, t.department_id, up.full_name, up.image, up.phone, up.email, up.address, up.username  FROM teacher t, user_person up WHERE t.user_id = up.id and up.full_name LIKE '%${search}%'`, (err, result) => {
         if (err) {
             res.send({
                 statusCode: 400,
