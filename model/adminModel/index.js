@@ -715,6 +715,48 @@ const getAllInternBoards = (req, res) => {
     })
 }
 
+const getAllInterningStudents = (req, res, searchIntern) => {
+    db.query(`SELECT st.id, up.image AS 'studentImage', up.full_name AS 'studentName', j.job_name, ij.start_date, ij.is_interning
+    FROM intern_job ij, student st, job j, user_person up, student_learn_intern sl
+    WHERE ij.student_id = st.id AND ij.job_id = j.id AND st.user_id = up.id AND sl.student_id = st.id
+        AND ij.is_interning = 1 AND ij.submit_status = 1
+        AND sl.student_id = st.id AND sl.is_learning = 1 AND sl.passed_status = 0
+        AND up.full_name LIKE '%${searchIntern}%'`, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err.toString()
+                })
+            } else {
+                res.send({
+                    statusCode: 200,
+                    responseData: result
+                })
+            }
+        })
+}
+
+const getAllCompletedInternStudents = (req, res) => {
+    db.query(`SELECT st.id, up.image AS 'studentImage', up.full_name AS 'studentName', j.job_name, ij.start_date, sl.score
+    FROM intern_job ij, student st, job j, user_person up, student_learn_intern sl
+    WHERE ij.student_id = st.id AND ij.job_id = j.id AND st.user_id = up.id 
+        AND ij.is_interning = 0 AND ij.submit_status = 1
+        AND sl.student_id = st.id AND sl.is_learning = 0 AND sl.passed_status = 1
+        `, (err, result) => {
+            if (err) {
+                res.send({
+                    statusCode: 400,
+                    responseData: err.toString()
+                })
+            } else {
+                res.send({
+                    statusCode: 200,
+                    responseData: result
+                })
+            }
+        })
+}
+
 const confirmLearnIntern = async (studentId, key) => {
     try {
         const query = `UPDATE student_learn_intern SET regist_status = 1, is_learning = 1 WHERE student_id = ${studentId} and id = ${key}`;
@@ -820,8 +862,8 @@ const saveRequestJobIntern = async (requestInfo, file) => {
     try {
         const result = new Promise((resolve, reject) => {
             db.query(
-              'INSERT INTO intern_job (start_date, submit_status, sent_require_time, job_id, student_id, appreciation_file, is_interning) VALUES (?, ?, ?, ?, ?, ?)',
-              [requestInfo.registDate, false, requestInfo.registDate, requestInfo.jobId, requestInfo.studentId, '', 0],
+              'INSERT INTO intern_job (start_date, submit_status, sent_require_time, job_id, student_id, appreciation_file, is_interning) VALUES (?, ?, ?, ?, ?, ?, ?)',
+              [requestInfo.registDate, false, requestInfo.registDate, requestInfo.jobId, requestInfo.studentId, '', false],
               (err, result) => {
                 if (err) {
                   reject(err);
@@ -871,6 +913,8 @@ module.exports = {
     deleteInternBoard,
     getAllInternBoards,
     getStudentSignUpIntern,
+    getAllInterningStudents,
+    getAllCompletedInternStudents,
     confirmLearnIntern,
     getStudentRequestJobIntern,
     confirmInternJobRequested,

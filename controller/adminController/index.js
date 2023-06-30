@@ -308,6 +308,15 @@ const handleGetAllInternBoards = (req, res) => {
     adminModel.getAllInternBoards(req, res);
 }
 
+const handleGetAllInterningStudents = (req, res) => {
+    const searchIntern = req.query.searchIntern || '';
+    adminModel.getAllInterningStudents(req, res, searchIntern);
+}
+
+const handleGetAllCompletedInternStudents = (req, res) => {
+    adminModel.getAllCompletedInternStudents(req, res);
+}
+
 const handleConfirmLearnIntern = async (req, res) => {
     try {
         const studentId = req.params.id;
@@ -416,6 +425,8 @@ module.exports = {
     handlePutInternBoard,
     handleDeleteInternBoard,
     handleGetAllInternBoards,
+    handleGetAllInterningStudents,
+    handleGetAllCompletedInternStudents,
     handleGetStudentSignUpIntern,
     handleConfirmLearnIntern,
     handleGetStudentRequestJobIntern,

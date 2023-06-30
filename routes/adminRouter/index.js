@@ -46,6 +46,8 @@ router.post('/intern/board/new', adminController.handlePostInternBoard);
 router.put('/intern/board/edit', adminController.handlePutInternBoard);
 router.delete('/intern/board/delete', adminController.handleDeleteInternBoard);
 router.get('/intern/board/all', adminController.handleGetAllInternBoards);
+router.get('/intern/students', adminController.handleGetAllInterningStudents);
+router.get('/intern/students/completed', adminController.handleGetAllCompletedInternStudents);
 
 router.get('/student/signup_intern', adminController.handleGetStudentSignUpIntern);
 router.put('/student/:id/confirm_learn_intern', adminController.handleConfirmLearnIntern);
