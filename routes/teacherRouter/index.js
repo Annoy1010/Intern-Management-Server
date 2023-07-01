@@ -14,5 +14,6 @@ router.delete('/todo/appreciation/remove', teacherController.removeAppreciationC
 router.get('/student', teacherController.getStudentLearnIntern);
 router.put('/save_score', teacherController.saveScore);
 router.put('/save_score/:id', teacherController.saveScore);
+router.put('/student/file', teacherController.saveFile);
 
 module.exports = router;

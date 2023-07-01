@@ -154,6 +154,34 @@ const updateTodoOfStudentController = (req, res) => {
     studentModel.updateTodoOfStudent(id, end_date, res);
 }
 
+const getFileAppreciateBusiness = async (req, res) => {
+    try {
+        const studentId = await studentModel.getStudentId(req.headers.authorization);
+        if (!studentId) return res.status(401).json('user was not found');
+
+        const result = await studentModel.getFileAppreciateBusiness(studentId);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.mesaage});
+    }
+}
+
+const getFileTeacher = async (req, res) => {
+    try {
+        const studentId = await studentModel.getStudentId(req.headers.authorization);
+        if (!studentId) return res.status(401).json('user was not found');
+
+        const result = await studentModel.getFileTeacher(studentId);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.mesaage});
+    }
+}
+
 module.exports = {
     getAllStudentsController,
     getStudentIdByUserIdController,
@@ -178,5 +206,7 @@ module.exports = {
     deleteJobFromLibraryController,
     getCareJobController,
     getAllTodoOfStudentController,
-    updateTodoOfStudentController
+    updateTodoOfStudentController,
+    getFileAppreciateBusiness,
+    getFileTeacher
 }

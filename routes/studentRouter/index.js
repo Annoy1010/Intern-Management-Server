@@ -21,14 +21,17 @@ router.get('/intern/job/regist/all', studentController.getAllRegistInternJobRequ
 router.delete('/intern/job/regist/id', studentController.deleteRegistInternJobRequestController);
 router.get('/intern/job/request', studentController.getAllRequestJobIntern);
 
-router.get('/job/all', studentController.getAllJobsController)
-router.get('/job/store', studentController.getJobInLibraryOfStudentController)
-router.post('/job/store/new', studentController.postJobToLibraryController)
-router.get('/job/library/all', studentController.getAllJobsInLibraryController)
-router.delete('/job/library/delete/id', studentController.deleteJobFromLibraryController)
-router.get('/job/care', studentController.getCareJobController)
+router.get('/job/all', studentController.getAllJobsController);
+router.get('/job/store', studentController.getJobInLibraryOfStudentController);
+router.post('/job/store/new', studentController.postJobToLibraryController);
+router.get('/job/library/all', studentController.getAllJobsInLibraryController);
+router.delete('/job/library/delete/id', studentController.deleteJobFromLibraryController);
+router.get('/job/care', studentController.getCareJobController);
 
-router.get('/todo/all', studentController.getAllTodoOfStudentController)
-router.put('/todo/complete', studentController.updateTodoOfStudentController)
+router.get('/todo/all', studentController.getAllTodoOfStudentController);
+router.put('/todo/complete', studentController.updateTodoOfStudentController);
+
+router.get('/file/business', studentController.getFileAppreciateBusiness);
+router.get('/file/teacher', studentController.getFileTeacher);
 
 module.exports = router;

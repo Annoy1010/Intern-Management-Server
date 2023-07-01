@@ -198,10 +198,11 @@ const getStudentLearnInternByUserId = async (userId, academicId = 0, semesterId 
     try {
         const query = `
             SELECT upst.id as 'userIdstudent', st.id as 'studentId', cl.id as 'classId', dp.id as 'departmentId', 
-                isb.id as 'internSubId', sli.id as 'studentLearnInternId', upst.*, st.*, cl.*, dp.*, isb.*, sli.*
+                isb.id as 'internSubId', sli.id as 'studentLearnInternId', sli.file as 'fileScoreRating', upst.*, st.*, cl.*, dp.*, isb.*, sli.*
             FROM user_person upst, student st, class cl, department dp, intern_subject isb, user_person uptc, teacher tc, student_learn_intern sli
             WHERE upst.id = st.user_id and st.class_id = cl.id and cl.department_id = dp.id and st.id = sli.student_id
-                and sli.subject_id = isb.id and isb.teacher_id = tc.id and tc.user_id = uptc.id and uptc.id = ${userId} 
+                and sli.subject_id = isb.id and isb.teacher_id = tc.id and tc.user_id = uptc.id and uptc.id = ${userId}
+                and sli.is_learning = 1 and sli.passed_status = 0
                 and (isb.academic_year = ${academicId} OR ${academicId} = 0) and (isb.semester_id = ${semesterId} OR ${semesterId} = 0) 
                 and upst.full_name LIKE '%${searchStudent}%'
         `;  
@@ -221,11 +222,11 @@ const saveScore = async (scores) => {
         const promises = scores.map(({ id, score }) => {
             const query = `
                 UPDATE student_learn_intern
-                SET score = ?
+                SET score = ?, passed_status = ?, is_learning = ?
                 WHERE id = ?
             `;
             return new Promise((resolve, reject) => {
-                db.query(query, [score, id], (err, result) => {
+                db.query(query, [score, 1, 0, id], (err, result) => {
                     if (err) reject(err);
                     else resolve(result);
                 });
@@ -233,6 +234,22 @@ const saveScore = async (scores) => {
           });
           const results = await Promise.all(promises);
           return results;
+    } catch (e) {
+        throw e;
+    }
+}
+
+const saveFile = async ({file, id}) => {
+    try {
+        const query = `
+            UPDATE student_learn_intern SET file = '${file}' WHERE id = ${id}
+        `;  
+    return new Promise((resolve, reject) => {
+        db.query(query, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
     } catch (e) {
         throw e;
     }
@@ -249,4 +266,5 @@ module.exports = {
     removeAppreciation,
     getStudentLearnInternByUserId,
     saveScore,
+    saveFile
 }

@@ -225,7 +225,7 @@ const getAllInterningStudent = async (businessId, searchIntern) => {
     try {
         return new Promise((resolve, reject) => {
             db.query(`
-            SELECT up.image, up.full_name, j.job_name, ij.start_date, ij.is_interning, up.email, up.address, sc.school_name, up.phone
+            SELECT st.id as 'studentId', up.image, up.full_name, j.job_name, ij.id as 'key', ij.start_date, ij.is_interning, up.email, up.address, sc.school_name, up.phone, ij.appreciation_file
             FROM intern_job ij, student st, job j, user_person up, program p, school sc 
             WHERE ij.student_id = st.id AND j.business_id = ${businessId}
                 AND ij.job_id = j.id AND st.user_id = up.id 

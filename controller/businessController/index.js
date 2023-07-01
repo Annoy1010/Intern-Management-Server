@@ -1,4 +1,5 @@
 const businessModel = require("../../model/businessModel");
+const JOI = require('joi');
 
 const handleGetBusinessInfo = (req, res) => {
     const user_id = req.query.user_id;
@@ -12,7 +13,7 @@ const handleGetAllJobs = (req, res) => {
 
 const handlePostNewJob = (req, res) => {
     const data = req.body;
-    const existedEmptyValue = Object.keys(data).some(item => data[`${item}`] === '' || data[`${item}`].length === 0 || data[`${item}`] === null)
+    const existedEmptyValue = Object.keys(data).some(item => data[`${item}`] === '' || data[`${item}`]?.length === 0 || data[`${item}`] === null)
     if (existedEmptyValue) {
         res.send({
             statusCode: 400,
