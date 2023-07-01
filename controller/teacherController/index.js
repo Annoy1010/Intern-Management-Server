@@ -107,7 +107,8 @@ const saveScore = async (req, res) => {
 const completeInternProcess = (req, res) => {
     const id = req.body.intern_id;
     const intern_job_id = req.body.intern_job_id;
-    teacherModel.completeInternProcess(id, intern_job_id, res)
+    const student_id = req.body.student_id;
+    teacherModel.completeInternProcess(id, intern_job_id, student_id, res)
 }
 
 const saveFile = async (req, res) => {

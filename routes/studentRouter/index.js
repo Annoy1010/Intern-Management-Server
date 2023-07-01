@@ -20,6 +20,7 @@ router.post('/intern/job/regist/new', studentController.postRegistInternJobReque
 router.get('/intern/job/regist/all', studentController.getAllRegistInternJobRequestController);
 router.delete('/intern/job/regist/id', studentController.deleteRegistInternJobRequestController);
 router.get('/intern/job/request', studentController.getAllRequestJobIntern);
+router.get('/interning', studentController.getInteringStatusOfStudent)
 
 router.get('/job/all', studentController.getAllJobsController);
 router.get('/job/store', studentController.getJobInLibraryOfStudentController);
@@ -34,5 +35,6 @@ router.put('/todo/complete', studentController.updateTodoOfStudentController);
 router.post('/report', studentController.saveReport);
 router.get('/file/business', studentController.getFileAppreciateBusiness);
 router.get('/file/teacher', studentController.getFileTeacher);
+router.get('/report', studentController.getReport);
 
 module.exports = router;

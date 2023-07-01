@@ -501,6 +501,20 @@ const getAllRequestJobIntern = (student_id, res) => {
     })
 }
 
+const getInteringStatusOfStudent = (student_id, res) => {
+    db.query(`
+        SELECT * FROM intern_job ij, student_learn_intern sli, student st 
+        WHERE ij.student_id = st.id AND sli.student_id = st.id AND st.id=${student_id}
+            AND sli.is_learning = 1 AND ij.is_interning = 1
+    `, (err, result) => {
+        if (err) {
+            res.status(401).json(err);
+        } else {
+            res.status(200).json(result);
+        }
+    })
+}
+
 const getAllJobs = (req, res, searchJob) => {
     db.query(`SELECT * FROM job WHERE vacancies > 0 and (job_name LIKE '%${searchJob}%')`, (err, result) => {
         if (err) {
@@ -729,6 +743,22 @@ const deleteReport = async (studentId) => {
     }
 }
 
+const getReport = async (studentId) => {
+    try {
+        const query = `
+            SELECT * FROM report WHERE student_id = ${studentId};
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]);
+            });
+        }); 
+    } catch (e) {
+        throw e;
+    }
+}
+
 module.exports = {
     getStudentId,
     getALLStudents,
@@ -747,6 +777,7 @@ module.exports = {
     getAllRegistInternJobRequest,
     deleteRegistInternJobRequest,
     getAllRequestJobIntern,
+    getInteringStatusOfStudent,
     getAllJobs,
     getJobInLibraryOfStudent,
     postJobToLibrary,
@@ -759,4 +790,5 @@ module.exports = {
     getFileTeacher,
     saveReport,
     deleteReport,
+    getReport
 }

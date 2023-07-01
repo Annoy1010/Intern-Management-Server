@@ -110,6 +110,11 @@ const getAllRequestJobIntern = (req, res) => {
     studentModel.getAllRequestJobIntern(student_id, res);
 }
 
+const getInteringStatusOfStudent = (req, res) => {
+    const studentId = req.query.studentId;
+    studentModel.getInteringStatusOfStudent(studentId, res)
+}
+
 const getAllJobsController = (req, res) => {
     const searchJob = req.query.searchJob || '';
     studentModel.getAllJobs(req, res, searchJob);
@@ -209,6 +214,19 @@ const saveReport = async (req, res) => {
     }
 }
 
+const getReport = async (req, res) => {
+    try {
+        const studentId = await studentModel.getStudentId(req.headers.authorization);
+        if (!studentId) return res.status(401).json('user was not found');
+
+        const result = await studentModel.getReport(studentId);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.mesaage});
+    }
+}
 
 module.exports = {
     getAllStudentsController,
@@ -227,6 +245,7 @@ module.exports = {
     getAllRegistInternJobRequestController,
     deleteRegistInternJobRequestController,
     getAllRequestJobIntern,
+    getInteringStatusOfStudent,
     getAllJobsController,
     getJobInLibraryOfStudentController,
     postJobToLibraryController,
@@ -237,5 +256,6 @@ module.exports = {
     updateTodoOfStudentController,
     getFileAppreciateBusiness,
     getFileTeacher,
-    saveReport
+    saveReport,
+    getReport
 }

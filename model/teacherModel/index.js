@@ -239,7 +239,7 @@ const saveScore = async (scores) => {
     }
 }
 
-const completeInternProcess = (id, intern_job_id, res) => {
+const completeInternProcess = (id, intern_job_id, student_id, res) => {
     const query = `
         UPDATE student_learn_intern
         SET passed_status = 1, is_learning = 0
@@ -255,7 +255,15 @@ const completeInternProcess = (id, intern_job_id, res) => {
                         res.status(403).json(err);
                     } else {
                         if (result.affectedRows > 0) {
-                            res.status(200).json('Xác nhận hoàn thành thực tập cho sinh viên thành công');
+                            db.query(`DELETE FROM job_favorite WHERE student_id = ${student_id}`, (err, result) => {
+                                if (err) {
+                                    res.status(403).json(err);
+                                } else {
+                                    if (result.affectedRows > 0) {
+                                        res.status(200).json('Xác nhận hoàn thành thực tập cho sinh viên thành công');
+                                    }
+                                } 
+                            })
                         }
                     }
                 })
