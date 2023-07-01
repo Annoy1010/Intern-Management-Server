@@ -31,4 +31,6 @@ router.get('/job/care', studentController.getCareJobController)
 router.get('/todo/all', studentController.getAllTodoOfStudentController)
 router.put('/todo/complete', studentController.updateTodoOfStudentController)
 
+router.get('/file/teacher', studentController.getFileTeacher);
+
 module.exports = router;

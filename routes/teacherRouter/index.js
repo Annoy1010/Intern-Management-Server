@@ -12,6 +12,7 @@ router.post('/todo/appreciation/new', teacherController.postTodoAppreciationCont
 router.get('/todo/appreciation/all', teacherController.getAllTodoAppreciationController);
 router.delete('/todo/appreciation/remove', teacherController.removeAppreciationController);
 router.get('/student', teacherController.getStudentLearnIntern);
+router.put('/student/file', teacherController.saveFile);
 router.put('/save_score', teacherController.saveScore);
 router.put('/save_score/:id', teacherController.saveScore);
 

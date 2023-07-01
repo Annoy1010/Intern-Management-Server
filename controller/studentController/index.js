@@ -148,6 +148,20 @@ const getAllTodoOfStudentController = (req, res) => {
     studentModel.getAllTodoOfStudent(student_id, res);
 }
 
+const getFileTeacher = async (req, res) => {
+    try {
+        const studentId = await studentModel.getStudentId(req.headers.authorization);
+        if (!studentId) return res.status(401).json('user was not found');
+
+        const result = await studentModel.getFileTeacher(studentId);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.mesaage});
+    }
+}
+
 const updateTodoOfStudentController = (req, res) => {
     const id = req.body.id;
     const end_date = req.body.end_date
@@ -178,5 +192,6 @@ module.exports = {
     deleteJobFromLibraryController,
     getCareJobController,
     getAllTodoOfStudentController,
-    updateTodoOfStudentController
+    updateTodoOfStudentController,
+    getFileTeacher,
 }

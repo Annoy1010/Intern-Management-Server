@@ -104,6 +104,27 @@ const saveScore = async (req, res) => {
     }
 }
 
+const saveFile = async (req, res) => {
+    try {
+        const userId = await userModel.getUserId(req.headers.authorization);
+        if (!userId) return res.status(403).json('Vui lòng đăng nhập trước');
+
+        const schema = Joi.object({
+            file: Joi.string().required(),
+            id: Joi.number().integer().required(),
+        });
+
+        const {error, value} = schema.validate(req.body);
+        if (error) return res.status(403).json(error);
+
+        await teacherModel.saveFile(value);
+        return res.status(200).json('Gữi file thành công');
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({detail: e.message});
+    }
+}
+
 module.exports = {
     getTeacherController,
     getAssignedListController,
@@ -116,4 +137,5 @@ module.exports = {
     removeAppreciationController,
     getStudentLearnIntern,
     saveScore,
+    saveFile,
 }

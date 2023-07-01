@@ -9,6 +9,21 @@ function hashPass(pass) {
     return hash.update(pass).digest('hex');
 }
 
+const getStudentId = async (token) => {
+    try {
+        const query = `SELECT st.id FROM user_account ua, user_person up, student st
+                        WHERE ua.token = '${token}' and ua.username = up.username and up.id = st.user_id`;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]?.id);
+            });
+        });    
+    } catch (e) {
+        throw e;
+    }
+}
+
 const getALLStudents = (req, res, search) => {
     db.query(`SELECT s.user_id, s.id as student_id, ps.image, ps.full_name, s.dob, ps.email, ps.address, s.class_id, c.class_name, s.major_id, d.id as department_id, s.current_status FROM student s, user_person ps, class c, department d WHERE s.user_id = ps.id and c.department_id = d.id and s.class_id = c.id and ps.full_name LIKE '%${search}%'`, (err, result) => {
         if(err){
@@ -631,6 +646,22 @@ const getAllTodoOfStudent = (student_id, res) => {
     })
 }
 
+const getFileTeacher = async (studentId) => {
+    try {
+        const query = `
+            SELECT file FROM student_learn_intern WHERE student_id = ${studentId}
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]?.file);
+            });
+        }); 
+    } catch (e) {
+        throw e;
+    }
+}
+
 const updateTodoOfStudent = (id, end_date, res) => {
     db.query(`UPDATE detail_todo SET completed_status = 1, out_of_expire=${new Date() > new Date(Date.parse(end_date)) ? 1 : 0} WHERE id=${id}`, (err, result) => {
         if (err) {
@@ -673,5 +704,7 @@ module.exports = {
     deleteJobFromLibrary,
     getCareJob,
     getAllTodoOfStudent,
-    updateTodoOfStudent
+    updateTodoOfStudent,
+    getFileTeacher,
+    getStudentId,
 }
