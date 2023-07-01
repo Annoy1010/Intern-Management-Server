@@ -634,7 +634,23 @@ const deleteReport = async (studentId) => {
         return new Promise((resolve, reject) => {
             db.query(query, (err, result) => {
                 if (err) reject(err);
-                else resolve(result[0]?.id);
+                else resolve(result);
+            });
+        }); 
+    } catch (e) {
+        throw e;
+    }
+}
+
+const getReport = async (studentId) => {
+    try {
+        const query = `
+            SELECT * FROM report WHERE student_id = ${studentId};
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]);
             });
         }); 
     } catch (e) {
@@ -687,4 +703,5 @@ module.exports = {
     saveReport,
     deleteReport,
     getFileAppreciateBusiness,
+    getReport,
 }
