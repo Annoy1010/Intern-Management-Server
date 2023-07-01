@@ -716,12 +716,18 @@ const getAllInternBoards = (req, res) => {
 }
 
 const getAllInterningStudents = (req, res, searchIntern) => {
-    db.query(`SELECT st.id, up.image AS 'studentImage', up.full_name AS 'studentName', j.job_name, ij.start_date, ij.is_interning
-    FROM intern_job ij, student st, job j, user_person up, student_learn_intern sl
-    WHERE ij.student_id = st.id AND ij.job_id = j.id AND st.user_id = up.id AND sl.student_id = st.id
-        AND ij.is_interning = 1 AND ij.submit_status = 1
-        AND sl.student_id = st.id AND sl.is_learning = 1 AND sl.passed_status = 0
-        AND up.full_name LIKE '%${searchIntern}%'`, (err, result) => {
+    db.query(`
+        SELECT st.id, up.image AS 'studentImage', up.full_name AS 'studentName', j.job_name, ij.start_date, ij.is_interning, r.report_file, r.result_business_file, r.result_teacher_file 
+        FROM intern_job ij
+        JOIN student st ON ij.student_id = st.id
+        JOIN job j ON ij.job_id = j.id
+        JOIN user_person up ON st.user_id = up.id
+        JOIN student_learn_intern sl ON sl.student_id = st.id
+        LEFT JOIN report r ON r.student_id = st.id
+        WHERE ij.is_interning = 1 AND ij.submit_status = 1
+            AND sl.is_learning = 1 AND sl.passed_status = 0
+            AND up.full_name LIKE '%${searchIntern}%';
+    `, (err, result) => {
             if (err) {
                 res.send({
                     statusCode: 400,
