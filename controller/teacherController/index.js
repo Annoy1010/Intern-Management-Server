@@ -104,6 +104,12 @@ const saveScore = async (req, res) => {
     }
 }
 
+const completeInternProcess = (req, res) => {
+    const id = req.body.intern_id;
+    const intern_job_id = req.body.intern_job_id;
+    teacherModel.completeInternProcess(id, intern_job_id, res)
+}
+
 const saveFile = async (req, res) => {
     try {
         const userId = await userModel.getUserId(req.headers.authorization);
@@ -118,7 +124,7 @@ const saveFile = async (req, res) => {
         if (error) return res.status(403).json(error);
 
         await teacherModel.saveFile(value);
-        return res.status(200).json('Gữi file thành công');
+        return res.status(200).json('Gửi file thành công');
     } catch (e) {
         console.log(e);
         return res.status(500).json({detail: e.message});
@@ -137,5 +143,6 @@ module.exports = {
     removeAppreciationController,
     getStudentLearnIntern,
     saveScore,
+    completeInternProcess,
     saveFile
 }

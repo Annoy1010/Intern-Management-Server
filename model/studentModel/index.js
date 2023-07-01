@@ -696,6 +696,39 @@ const getFileTeacher = async (studentId) => {
     }
 }
 
+const saveReport = async ({result_file, result_business_file, result_teacher_file, sent_time}, studentId) => {
+    try {
+        const query = `
+            INSERT INTO  report (report_file, result_business_file, result_teacher_file, sent_time, student_id)
+            VALUES ('${result_file}', '${result_business_file}', '${result_teacher_file}', '${sent_time}', ${studentId})
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]?.id);
+            });
+        }); 
+    } catch (e) {
+        throw e;
+    }
+}
+
+const deleteReport = async (studentId) => {
+    try {
+        const query = `
+            DELETE FROM report WHERE student_id = ${studentId}
+        `;
+        return new Promise((resolve, reject) => {
+            db.query(query, (err, result) => {
+                if (err) reject(err);
+                else resolve(result[0]?.id);
+            });
+        }); 
+    } catch (e) {
+        throw e;
+    }
+}
+
 module.exports = {
     getStudentId,
     getALLStudents,
@@ -723,5 +756,7 @@ module.exports = {
     getAllTodoOfStudent,
     updateTodoOfStudent,
     getFileAppreciateBusiness,
-    getFileTeacher
+    getFileTeacher,
+    saveReport,
+    deleteReport,
 }

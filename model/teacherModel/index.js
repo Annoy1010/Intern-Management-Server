@@ -197,10 +197,10 @@ const removeAppreciation = (id, res) => {
 const getStudentLearnInternByUserId = async (userId, academicId = 0, semesterId = 0, searchStudent = '') => {
     try {
         const query = `
-            SELECT upst.id as 'userIdstudent', st.id as 'studentId', cl.id as 'classId', dp.id as 'departmentId', 
+            SELECT upst.id as 'userIdstudent', st.id as 'studentId', cl.id as 'classId', dp.id as 'departmentId', ij.id as 'internJobId',
                 isb.id as 'internSubId', sli.id as 'studentLearnInternId', sli.file as 'fileScoreRating', upst.*, st.*, cl.*, dp.*, isb.*, sli.*
-            FROM user_person upst, student st, class cl, department dp, intern_subject isb, user_person uptc, teacher tc, student_learn_intern sli
-            WHERE upst.id = st.user_id and st.class_id = cl.id and cl.department_id = dp.id and st.id = sli.student_id
+            FROM user_person upst, student st, class cl, department dp, intern_subject isb, user_person uptc, teacher tc, student_learn_intern sli, intern_job ij
+            WHERE upst.id = st.user_id and st.class_id = cl.id and cl.department_id = dp.id and st.id = sli.student_id and ij.student_id = st.id
                 and sli.subject_id = isb.id and isb.teacher_id = tc.id and tc.user_id = uptc.id and uptc.id = ${userId}
                 and sli.is_learning = 1 and sli.passed_status = 0
                 and (isb.academic_year = ${academicId} OR ${academicId} = 0) and (isb.semester_id = ${semesterId} OR ${semesterId} = 0) 
@@ -222,11 +222,11 @@ const saveScore = async (scores) => {
         const promises = scores.map(({ id, score }) => {
             const query = `
                 UPDATE student_learn_intern
-                SET score = ?, passed_status = ?, is_learning = ?
+                SET score = ?
                 WHERE id = ?
             `;
             return new Promise((resolve, reject) => {
-                db.query(query, [score, 1, 0, id], (err, result) => {
+                db.query(query, [score, id], (err, result) => {
                     if (err) reject(err);
                     else resolve(result);
                 });
@@ -237,6 +237,31 @@ const saveScore = async (scores) => {
     } catch (e) {
         throw e;
     }
+}
+
+const completeInternProcess = (id, intern_job_id, res) => {
+    const query = `
+        UPDATE student_learn_intern
+        SET passed_status = 1, is_learning = 0
+        WHERE id = ?
+    `;
+    db.query(query, [id], (err, result) => {
+        if (err) {
+            res.status(403).json(err);
+        } else {
+            if (result.affectedRows > 0) {
+                db.query(`UPDATE intern_job SET is_interning = 0 WHERE id = ${intern_job_id}`, (err, result) => {
+                    if (err) {
+                        res.status(403).json(err);
+                    } else {
+                        if (result.affectedRows > 0) {
+                            res.status(200).json('Xác nhận hoàn thành thực tập cho sinh viên thành công');
+                        }
+                    }
+                })
+            }
+        }
+    });
 }
 
 const saveFile = async ({file, id}) => {
@@ -266,5 +291,6 @@ module.exports = {
     removeAppreciation,
     getStudentLearnInternByUserId,
     saveScore,
+    completeInternProcess,
     saveFile
 }

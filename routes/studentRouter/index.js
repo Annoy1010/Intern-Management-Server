@@ -31,6 +31,7 @@ router.get('/job/care', studentController.getCareJobController);
 router.get('/todo/all', studentController.getAllTodoOfStudentController);
 router.put('/todo/complete', studentController.updateTodoOfStudentController);
 
+router.post('/report', studentController.saveReport);
 router.get('/file/business', studentController.getFileAppreciateBusiness);
 router.get('/file/teacher', studentController.getFileTeacher);
 
